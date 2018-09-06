@@ -53,7 +53,7 @@ function sendScreenshot() {
     try {
 	console.log(video.videoWidth);
 	console.log(video.videoHeight);
-	let screenshot = ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+	let screenshot = ctx.drawImage(video, 0, 0);
 	ws.send(canvas.toDataURL('image/jpeg', 0.1));
     } catch (e) {
 	console.log('Unable to acquire screenshot: ' + e);
