@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Native WebSocket Example</title>
+</head>
+<body>
+  <div class="flexChild" id="camera-container">
+    <div class="camera-box">
+      <video id="local_video" autoplay muted></video>
+      <img id="received_video" width=640 height=480>
+      <button id="hangup-button" onclick="hangUpCall();" disabled>
+	Hang Up
+      </button>
+    </div>
+    <canvas id="screenshot" style="display:none;" width=640 height=480></canvas>
+  </div>
+  <script src="client.js"></script>
+</body>
+</html>
