@@ -1,5 +1,4 @@
 var randomString = require('random-string');
-var randomCookie = null;
 
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize('tongtongship', 'tongtongship', '20tongs!', {
