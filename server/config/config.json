@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "tongtongship",
+    "password": "20tongs!",
+    "database": "tongtongship",
+    "host": "tongtongdb.cek80gowrna6.ap-northeast-2.rds.amazonaws.com",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "tongtongship",
+    "password": "20tongs!",
+    "database": "tongtongship",
+    "host": "tongtongdb.cek80gowrna6.ap-northeast-2.rds.amazonaws.com",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "tongtongship",
+    "password": "20tongs!",
+    "database": "tongtongship",
+    "host": "tongtongdb.cek80gowrna6.ap-northeast-2.rds.amazonaws.com",
+    "dialect": "postgres"
+  }
+}
