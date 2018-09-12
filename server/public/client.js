@@ -9,7 +9,11 @@ ws.onopen = function(event) {
 }
 
 ws.onmessage = function(event) {
-    image.src = event.data;
+//    image.src = event.data;
+//	console.log(event.data);
+//	console.log('=========');
+	image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/sex.jpeg?t=' + new Date().getTime();
+//	console.log();
 }
 
 // error event handler
