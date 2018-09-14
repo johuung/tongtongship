@@ -12,6 +12,8 @@ ws.onmessage = function(event) {
 //    image.src = event.data;
 //	console.log(event.data);
 //	console.log('=========');
+    
+    console.log(event.data);
     image.src = event.data + '?t=' + new Date().getTime();
     //image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 //	console.log();
