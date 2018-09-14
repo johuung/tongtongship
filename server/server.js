@@ -72,7 +72,10 @@ wss.on('connection', function connection(ws) {
         console.log(data);
 	});
 	*/
-   	ws.send('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
+	guests = getGuests(cookie);
+	data = JSON.stringify({'guests': guests});
+	console.log(data);
+   	ws.send(data);
     });
     ws.on('close', function close() {
 	console.log('disconnected');
@@ -105,4 +108,18 @@ function getRandomCookie() {
   while(sw == false);
 
   return tempCookie;
+}
+
+function getGuests(cookie) {
+
+    var guests = ['http://www.kidsmathgamesonline.com/images/pictures/numbers600/number1.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number2.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number3.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number4.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number5.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number6.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number7.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number8.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number9.jpg'];
+    return guests;
 }
