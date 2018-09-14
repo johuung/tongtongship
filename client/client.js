@@ -9,7 +9,7 @@ ws.onopen = function(event) {
 }
 
 ws.onmessage = function(event) {
-    //image.src = event.data;
+    image.src = event.data + '?t=' + new Date().getTime();
 }
 
 // error event handler
