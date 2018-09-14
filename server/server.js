@@ -3,6 +3,8 @@ var app = express();
 var path = require("path");
 var randomString = require('random-string');
 
+
+
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize('tongtongship', 'tongtongship', '20tongs!', {
   host: 'tongtongdb.cek80gowrna6.ap-northeast-2.rds.amazonaws.com',
@@ -19,22 +21,6 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-const User = sequelize.define('user', {
-  cookie: {
-    type: Sequelize.STRING,
-    primaryKey: true,
-    unique: true,
-    allowNull: false
-  },
-  url: {
-    type: Sequelize.STRING,
-    allowNull: true
-  }
-});
-
-User.sync({force: true}).then(() => {
-  console.log('table created');
-});
 
 var myBucket = 'jehyunlims-bucket93';
 
