@@ -12,7 +12,6 @@ const sequelize = new Sequelize('tongtongship', 'tongtongship', '20tongs!', {
   dialect: 'postgres',
   operatorsAliases: false,
 });
-const Op = Sequelize.Op;
 
 sequelize
   .authenticate()
@@ -75,28 +74,14 @@ wss.on('connection', function connection(ws) {
 });
 
 function getRandomUsers(tempCookie) {
-  UserImages.findAll({where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]]})
-	.then(user => {
-    return user;
-    //for(var i=0; i<user.length; i++) {
-    //  console.log('-------------' + user[i].cookie);
-    //}
-	});
+    UserImages.findAll({})
+	.then((user) => {
+	    });
+}
 }
 
 function addUser(tempCookie) {
-  var randomUsers = getRandomUsers(tempCookie);
-
-  var info = {
-    cookie: tempCookie,
-    url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
-  };
-
-  for(var i=0; i<9; i++) {
-    info["guest" + String(i)] =  randomUsers[i].get('cookie');
-  }
-
-  UserImages.create(info);
+  UserImages.create({cookie: tempCookie, url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'});
   console.log('add User complete');
 }
 
