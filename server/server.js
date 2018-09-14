@@ -12,8 +12,12 @@ const sequelize = new Sequelize('tongtongship', 'tongtongship', '20tongs!', {
   dialect: 'postgres',
   operatorsAliases: false,
 });
+<<<<<<< HEAD
 const Op = Sequelize.Op;
 
+=======
+/*
+>>>>>>> 1687da8e709dc6cc77fa9a1e403bb956f572f191
 sequelize
   .authenticate()
   .then(() => {
@@ -22,7 +26,7 @@ sequelize
   .catch(err => {
     console.error('Unable to connect to the database:', err);
   });
-
+*/
 
 var myBucket = 'jehyunlims-bucket93';
 
@@ -39,7 +43,7 @@ app.use('/static', express.static(path.join(__dirname, 'public')))
 
 app.get('/', function (req, res) {
     var tempCookie = getRandomCookie();
-    res.append('Set-Cookie', tempCookie);
+    res.append('Set-Cookie', 'cookie='+tempCookie);
     res.sendFile(path.join(__dirname+'/../client/client.html'));
     addUser(tempCookie);
     console.log('set cookie : ' + tempCookie);
@@ -52,14 +56,17 @@ const http = require('http');
 const server = new http.createServer(app).listen(8080);
 const wss = new WebSocket.Server({ server });
 wss.on('connection', function connection(ws) {
+    var cookie;
     ws.on('message', function incoming(message) {
 	json = JSON.parse(message);
 	console.log('received cookie: %s', json.cookie);
 	var recvCookie = json.cookie;
+	cookie = json.cookie;
+	/*
 	var b64string = json.image;
 	var data = b64string.replace(/^data:image\/\w+;base64,/, "");
 	var buf = new Buffer(data, 'base64');
-	/*
+	
 	var params = { Bucket: myBucket, Key: recvCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
 	s3.upload(params, function(err, data){
         if (err) {
@@ -70,8 +77,15 @@ wss.on('connection', function connection(ws) {
         console.log(data);
 	});
 	*/
-   	ws.send('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
-    }); 
+	guests = getGuests(cookie);
+	data = JSON.stringify({'guests': guests});
+	console.log(data);
+   	ws.send(data);
+    });
+    ws.on('close', function close() {
+	console.log('disconnected');
+	deleteUser(cookie);
+    });
 });
 
 function getRandomUsers(tempCookie) {
@@ -100,6 +114,11 @@ function addUser(tempCookie) {
   console.log('add User complete');
 }
 
+function deleteUser(cookie) {
+    UserImages.destroy({where: {cookie: cookie}}).then(function(result) {
+	console.log(result);
+    });
+}
 function getRandomCookie() {
   var tempCookie;
   var sw = true;
@@ -115,4 +134,18 @@ function getRandomCookie() {
   while(sw == false);
 
   return tempCookie;
+}
+
+function getGuests(cookie) {
+
+    var guests = ['http://www.kidsmathgamesonline.com/images/pictures/numbers600/number1.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number2.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number3.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number4.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number5.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number6.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number7.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number8.jpg',
+		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number9.jpg'];
+    return guests;
 }

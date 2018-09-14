@@ -1,6 +1,9 @@
 var ws = new WebSocket("ws://localhost:8080");
 var video = document.getElementById("local_video");
-var image = document.getElementById("received_video");
+
+var image = new Array();
+image[0] = document.getElementById("received_video_00");
+
 var canvas = document.getElementById("screenshot");
 var ctx = canvas.getContext('2d');
 
@@ -12,7 +15,7 @@ ws.onmessage = function(event) {
 //    image.src = event.data;
 //	console.log(event.data);
 //	console.log('=========');
-    image.src = event.data + '?t=' + new Date().getTime();
+    image[0].src = event.data + '?t=' + new Date().getTime();
     //image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 //	console.log();
 }
@@ -57,7 +60,7 @@ function sendScreenshot() {
     try {
 	let screenshot = ctx.drawImage(video, 0, 0);
 	img = canvas.toDataURL('image/jpeg', 0.1);
-	cookie = document.cookie;
+	cookie = document.cookie.replace(/(?:(?:^|.*;\s*)cookie\s*\=\s*([^;]*).*$)|^.*$/, "$1");
 	ws.send(JSON.stringify({ "cookie" : cookie, "image" : img }));
     } catch (e) {
 	console.log('Unable to acquire screenshot: ' + e);
