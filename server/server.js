@@ -12,10 +12,8 @@ const sequelize = new Sequelize('tongtongship', 'tongtongship', '20tongs!', {
   dialect: 'postgres',
   operatorsAliases: false,
 });
-<<<<<<< HEAD
 const Op = Sequelize.Op;
 
-=======
 /*
 >>>>>>> 1687da8e709dc6cc77fa9a1e403bb956f572f191
 sequelize
@@ -89,17 +87,17 @@ wss.on('connection', function connection(ws) {
 });
 
 function getRandomUsers(tempCookie) {
-  UserImages.findAll({where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]]})
-	.then(user => {
-    return user;
-    //for(var i=0; i<user.length; i++) {
-    //  console.log('-------------' + user[i].cookie);
-    //}
+	return new Promise(function (resolve, reject) {
+	  UserImages.findAll({where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]]})
+		.then(user => {
+			resolve(user);
+		});
 	});
 }
 
 function addUser(tempCookie) {
-  var randomUsers = getRandomUsers(tempCookie);
+
+  getRandomUsers(tempCookie).then(function (randomUsers) {
 
   var info = {
     cookie: tempCookie,
@@ -107,11 +105,12 @@ function addUser(tempCookie) {
   };
 
   for(var i=0; i<9; i++) {
-    info["guest" + String(i)] =  randomUsers[i].get('cookie');
+    info["guest" + String(i+1)] =  randomUsers[i].get('cookie');
   }
 
   UserImages.create(info);
   console.log('add User complete');
+	});
 }
 
 function deleteUser(cookie) {
