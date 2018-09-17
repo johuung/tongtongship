@@ -75,10 +75,11 @@ wss.on('connection', function connection(ws) {
         console.log(data);
 	});
 	*/
-	guests = getGuests(cookie);
-	data = JSON.stringify({'guests': guests});
-	console.log(data);
-   	ws.send(data);
+	getGuests(cookie).then(function (guests) { 
+	    data = JSON.stringify({'guests': guests});
+	    console.log(data);
+   	    ws.send(data);
+	});
     });
     ws.on('close', function close() {
 	console.log('disconnected');
@@ -106,7 +107,7 @@ function addUser(tempCookie) {
     url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
   };
 
-  for(var i=0; i<9; i++) {
+  for(var i=0; i<randomUsers.length; i++) {
     info["guest" + String(i+1)] =  randomUsers[i].get('cookie');
 
   }
@@ -139,15 +140,9 @@ function getRandomCookie() {
 }
 
 function getGuests(cookie) {
-
-    var guests = ['http://www.kidsmathgamesonline.com/images/pictures/numbers600/number1.jpg',
-		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number2.jpg',
-		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number3.jpg',
-		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number4.jpg',
-		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number5.jpg',
-		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number6.jpg',
-		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number7.jpg',
-		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number8.jpg',
-		  'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number9.jpg'];
-    return guests;
+    return new Promise(function (resolve, reject) {
+	UserImages.findOne({attributes: ['guest1', 'guest2', 'guest3', 'guest4', 'guest5', 'guest6', 'guest7', 'guest8', 'guest9'], where: { cookie: cookie }, raw: true}).then(person => {
+	    resolve(person);
+	});
+    });
 }
