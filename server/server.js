@@ -12,8 +12,13 @@ const sequelize = new Sequelize('tongtongship', 'tongtongship', '20tongs!', {
   dialect: 'postgres',
   operatorsAliases: false,
 });
+<<<<<<< HEAD
 
 const Op = Sequelize.Op;
+=======
+const Op = Sequelize.Op;
+
+>>>>>>> 2c89ccd2eafee54be869c30e8028dd957e446690
 /*
 sequelize
   .authenticate()
@@ -86,6 +91,7 @@ wss.on('connection', function connection(ws) {
 });
 
 function getRandomUsers(tempCookie) {
+<<<<<<< HEAD
     var a = new Array();
     UserImages.findAll({attributes: ['cookie'], where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]], raw: true})
 	.then(userList => {
@@ -99,24 +105,43 @@ function getRandomUsers(tempCookie) {
 	    //for(var i=0; i<user.length; i++) {
 	    //  console.log('-------------' + user[i].cookie);
 	    //}
+=======
+	return new Promise(function (resolve, reject) {
+	  UserImages.findAll({where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]]})
+		.then(user => {
+			resolve(user);
+		});
+>>>>>>> 2c89ccd2eafee54be869c30e8028dd957e446690
 	});
     return a;    
 }
 
 function addUser(tempCookie) {
+<<<<<<< HEAD
   var randomUsers = getRandomUsers(tempCookie);
     console.log(randomUsers.length);
+=======
+
+  getRandomUsers(tempCookie).then(function (randomUsers) {
+
+>>>>>>> 2c89ccd2eafee54be869c30e8028dd957e446690
   var info = {
     cookie: tempCookie,
     url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
   };
 
+<<<<<<< HEAD
   for(var i=0; i<randomUsers.length; i++) {
       info["guest" + String(i)] =  randomUsers[i].get('cookie');
+=======
+  for(var i=0; i<9; i++) {
+    info["guest" + String(i+1)] =  randomUsers[i].get('cookie');
+>>>>>>> 2c89ccd2eafee54be869c30e8028dd957e446690
   }
     console.log(info);
   UserImages.create(info);
   console.log('add User complete');
+	});
 }
 
 function deleteUser(cookie) {
