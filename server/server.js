@@ -27,7 +27,8 @@ sequelize
 */
 
 var myBucket = 'jehyunlims-bucket93';
-
+//var myKey = '';
+//var mySecKey = '';
 var AWS = require('aws-sdk');
 /*
 var s3 = new AWS.S3(
@@ -47,40 +48,16 @@ app.get('/', function (req, res) {
     console.log('set cookie : ' + tempCookie);
 });
 
-
 const WebSocket = require('ws');
 const http = require('http');
 //const wss = new WebSocket.Server({ port: 8080 });
 const server = new http.createServer(app).listen(8080);
 const wss = new WebSocket.Server({ server });
+
 wss.on('connection', function connection(ws) {
     var cookie;
     ws.on('message', function incoming(message) {
-	json = JSON.parse(message);
-	console.log('received cookie: %s', json.cookie);
-	var recvCookie = json.cookie;
-	cookie = json.cookie;
-	/*
-	var b64string = json.image;
-	var data = b64string.replace(/^data:image\/\w+;base64,/, "");
-	var buf = new Buffer(data, 'base64');
-	
-	var params = { Bucket: myBucket, Key: recvCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
-	s3.upload(params, function(err, data){
-        if (err) {
-          console.log('error in callback');
-          console.log(err);
-        }
-        console.log('success');
-        console.log(data);
-	});
-	*/
-	getGuests(cookie).then(function (guests) { 
-	    data = JSON.stringify({'guests': guests});
-	    //console.log(data);
-   	    ws.send(data);
-	    
-	});
+	recvMessage(ws, cookie, message);
     });
     ws.on('close', function close() {
 	console.log('disconnected');
@@ -125,6 +102,7 @@ function deleteUser(cookie) {
 	console.log(result);
     });
 }
+
 function getRandomCookie() {
   var tempCookie;
   var sw = true;
@@ -200,3 +178,33 @@ function refreshGuests() {
 	}
     });
 }
+function recvMessage(webSocket, clientCookie, recvMsg){
+        var json = JSON.parse(recvMsg);
+        console.log('received cookie: %s', json.cookie);
+
+        if(json.type=="screenshot"){
+                clientCookie = json.cookie;
+
+/*              var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+                var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
+                s3.upload(params, function(err, data){
+                         if (err) {
+                           console.log('error in callback');
+                           console.log(err);
+                         }
+                         console.log('success');
+                         console.log(data);
+                });
+*/
+                getGuests(clientCookie).then(function (guests) {
+                    var data = JSON.stringify({'type' : 'urls', 'guests': guests});
+                    console.log(data);
+                    webSocket.send(data);
+                });
+        }
+        else if(json.type=="button"){
+                var data = JSON.stringify({'type' : 'echo', 'string' : 'This is Echo' });
+                webSocket.send(data);
+        }
+}
+

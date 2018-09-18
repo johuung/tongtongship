@@ -3,7 +3,7 @@ var video = document.getElementById("local_video");
 
 var image = new Array();
 for(var i = 0; i<9; i++){
-image[i] = document.getElementById("received_video_0"+i);
+	image[i] = document.getElementById("received_video_0"+i);
 }
 
 var test_text = new Array();
@@ -20,31 +20,7 @@ ws.onopen = function(event) {
 }
 
 ws.onmessage = function(event) {
-//    image.src = event.data;
-	if(JSON.parse(event.data).type == 'urls'){
-		for(var i = 0; i<9; i++){
-		//    image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
-			var guest_num = "guest"+String(i+1);
-			//console.log(guest_num);
-			if (JSON.parse(event.data).guests[guest_num] == null) {
-				test_text[i].innerHTML = "Guest #"+ String(i+1)+" is null";
-			}
-			else {
-				test_text[i].innerHTML = JSON.parse(event.data).guests[guest_num];
-			}
-		}  
- 	//image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
-	//	console.log();
-	}
-	else if(JSON.parse(event.data).type == 'echo'){
-		var confirmflag = confirm(JSON.parse(event.data).string);
-		if(confirmflag){
-			console.log('ok');
-		}
-		else{
-			console.log('cancle');
-		}
-	}
+	recvEvent(event);
 }
 
 // error event handler
@@ -92,6 +68,31 @@ function sendScreenshot() {
     } catch (e) {
 	console.log('Unable to acquire screenshot: ' + e);
     }
+}
+
+function recvEvent(event){
+        if(JSON.parse(event.data).type == 'urls'){
+                for(var i = 0; i<9; i++){
+//                      image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
+                        var guest_num = "guest"+String(i+1);
+                        if (JSON.parse(event.data).guests[guest_num] == null) {
+                                test_text[i].innerHTML = "Guest #"+ String(i+1)+" is null";
+                        }
+                        else {
+                                test_text[i].innerHTML = JSON.parse(event.data).guests[guest_num];
+                        }
+                }
+//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
+        }
+        else if(JSON.parse(event.data).type == 'echo'){
+                var confirmflag = confirm(JSON.parse(event.data).string);
+                if(confirmflag){
+                        console.log('ok');
+                }
+                else{
+                        console.log('cancle');
+                }
+        }
 }
 
 function hangUpCall(){
