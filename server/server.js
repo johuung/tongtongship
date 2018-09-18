@@ -55,13 +55,15 @@ const server = new http.createServer(app).listen(8080);
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', function connection(ws) {
-    var cookie;
+    var currCookie;
     ws.on('message', function incoming(message) {
-	recvMessage(ws, cookie, message);
+	recvMessage(ws, message).then(cookie => {
+	    currCookie = cookie;
+	});
     });
     ws.on('close', function close() {
 	console.log('disconnected');
-	deleteUser(cookie);
+	deleteUser(currCookie);
 	refreshGuests();
     });
 });
@@ -178,33 +180,36 @@ function refreshGuests() {
 	}
     });
 }
-function recvMessage(webSocket, clientCookie, recvMsg){
-        var json = JSON.parse(recvMsg);
+function recvMessage(webSocket, recvMsg){
+    return new Promise(function (resolve, reject) {
+	var clientCookie;
+	var json = JSON.parse(recvMsg);
         console.log('received cookie: %s', json.cookie);
-
+	
         if(json.type=="screenshot"){
-                clientCookie = json.cookie;
-
-/*              var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
-                var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
-                s3.upload(params, function(err, data){
-                         if (err) {
-                           console.log('error in callback');
-                           console.log(err);
-                         }
-                         console.log('success');
-                         console.log(data);
-                });
-*/
-                getGuests(clientCookie).then(function (guests) {
-                    var data = JSON.stringify({'type' : 'urls', 'guests': guests});
-                    console.log(data);
-                    webSocket.send(data);
-                });
+            clientCookie = json.cookie;
+	    
+	    /*              var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+			    var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
+			    s3.upload(params, function(err, data){
+                            if (err) {
+                            console.log('error in callback');
+                            console.log(err);
+                            }
+                            console.log('success');
+                            console.log(data);
+			    });
+	    */
+            getGuests(clientCookie).then(function (guests) {
+                var data = JSON.stringify({'type' : 'urls', 'guests': guests});
+                console.log(data);
+                webSocket.send(data);
+            });
         }
         else if(json.type=="button"){
-                var data = JSON.stringify({'type' : 'echo', 'string' : 'This is Echo' });
-                webSocket.send(data);
+            var data = JSON.stringify({'type' : 'echo', 'string' : 'This is Echo' });
+            webSocket.send(data);
         }
+	resolve(clientCookie);
+    });
 }
-
