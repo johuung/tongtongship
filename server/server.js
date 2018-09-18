@@ -199,5 +199,4 @@ function refreshGuests() {
 	    fillNullGuest(users[i]);
 	}
     });
-
 }
