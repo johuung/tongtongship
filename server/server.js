@@ -44,7 +44,6 @@ app.get('/', function (req, res) {
     res.append('Set-Cookie', 'cookie='+tempCookie);
     res.sendFile(path.join(__dirname+'/../client/client.html'));
     addUser(tempCookie);
-    refreshGuests();
     console.log('set cookie : ' + tempCookie);
 });
 
@@ -93,7 +92,7 @@ wss.on('connection', function connection(ws) {
 function getRandomUsers(tempCookie) {
 
 	return new Promise(function (resolve, reject) {
-	  UserImages.findAll({where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]]})
+	    UserImages.findAll({where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]]})
 		.then(user => {
 			resolve(user);
 		});
@@ -114,7 +113,9 @@ function addUser(tempCookie) {
     info["guest" + String(i+1)] =  randomUsers[i].get('cookie');
 
   }
-  UserImages.create(info);
+      UserImages.create(info).then(() => {
+	  refreshGuests();
+      });
   console.log('add User complete');
 	});
 }
@@ -159,7 +160,7 @@ function getUsersHavingNullGuests() {
 					      {guest6: {[Op.eq]: null}},
 					      {guest7: {[Op.eq]: null}},
 					      {guest8: {[Op.eq]: null}},
-					      {guest9: {[Op.eq]: null}}]}, raw: true})
+					      {guest9: {[Op.eq]: null}}]}})
 	    .then(users => {
 		resolve(users);
 	    });
@@ -168,20 +169,21 @@ function getUsersHavingNullGuests() {
 
 function fillNullGuest(user) {
     return new Promise(function (resolve, reject) {
-
-	var exceptCookies = {where: {[Op.and]: [{cookie: {[Op.ne]: user.cookie}}]}, limit: 1, order: [Sequelize.fn('RANDOM')]};
+	var exceptCookies = {where: {$and: [{cookie: {$ne: user.cookie}}]}, limit: 1, order: [Sequelize.fn('RANDOM')]};
 	for (let i = 0; i < 9; i++) {
 	    tempCookie = user['guest' + i.toString()];
 	    if (tempCookie != null) {
-		exceptCookies.push({cookie: {[Op.ne]: tempCookie}});
+		exceptCookies.where['$and'].push({cookie: {$ne: tempCookie}});
 	    }
 	}
 	UserImages.findAll(exceptCookies).then(guest => {
-	    for (let i = 0; i < 9; i++) {
-		tempField = 'guest' + i.toString();
-		if (user[tempField] == null) {
-		    user.update({tempField: guest.cookie});
-		    break;
+	    if (guest != 0) {
+		for (let i = 0; i < 9; i++) {
+		    tempField = 'guest' + (i+1).toString();
+		    if (user.get(tempField) == null) {
+			user.update({[tempField]: guest[0].get('cookie')});
+			break;
+		    }
 		}
 	    }
 	    resolve();
@@ -191,10 +193,11 @@ function fillNullGuest(user) {
 }
 
 function refreshGuests() {
-    var users = getUsersHavingNullGuests();
 
-    for (let i = 0; i < users.length; i++) {
-	console.log(users[i]);
-	fillNullGuest(users[i]);
-    }
+    getUsersHavingNullGuests().then(users => {
+	for (let i = 0; i < users.length; i++) {   
+	    fillNullGuest(users[i]);
+	}
+    });
+
 }
