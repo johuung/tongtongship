@@ -187,7 +187,6 @@ function refreshGuests() {
 function recvMessage(webSocket, recvMsg){
     return new Promise(function (resolve, reject) {
 	var json = JSON.parse(recvMsg);
-        console.log('received cookie: %s', json.cookie);
 	
         if(json.type=="screenshot"){
 	    
