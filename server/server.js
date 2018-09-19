@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var path = require("path");
 var randomString = require('random-string');
+var cookie = require('cookie');
 
 var models = require('./models');
 var UserImages = models.UserImage;
@@ -42,7 +43,7 @@ app.use('/static', express.static(path.join(__dirname, 'public')))
 
 app.get('/', function (req, res) {
     var tempCookie = getRandomCookie();
-    res.append('Set-Cookie', 'cookie='+tempCookie);
+    res.append('Set-Cookie', cookie.serialize('cookie', tempCookie));
     res.sendFile(path.join(__dirname+'/../client/client.html'));
     addUser(tempCookie);
     console.log('set cookie : ' + tempCookie);
@@ -52,18 +53,21 @@ const WebSocket = require('ws');
 const http = require('http');
 //const wss = new WebSocket.Server({ port: 8080 });
 const server = new http.createServer(app).listen(8080);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ server: server, clientTracking: true });
 
-wss.on('connection', function connection(ws) {
-    var currCookie;
+wss.on('connection', function connection(ws, req) {
+
+    reqCookies = cookie.parse(req.headers.cookie);
+    ws.cookie = reqCookies['cookie'];
+
+    console.log(wss.clients);
+
     ws.on('message', function incoming(message) {
-	recvMessage(ws, message).then(cookie => {
-	    currCookie = cookie;
-	});
+	recvMessage(ws, message);
     });
     ws.on('close', function close() {
 	console.log('disconnected');
-	deleteUser(currCookie);
+	deleteUser(ws.cookie);
 	refreshGuests();
     });
 });
@@ -182,12 +186,10 @@ function refreshGuests() {
 }
 function recvMessage(webSocket, recvMsg){
     return new Promise(function (resolve, reject) {
-	var clientCookie;
 	var json = JSON.parse(recvMsg);
         console.log('received cookie: %s', json.cookie);
 	
         if(json.type=="screenshot"){
-            clientCookie = json.cookie;
 	    
 	    /*              var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
 			    var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
@@ -200,7 +202,7 @@ function recvMessage(webSocket, recvMsg){
                             console.log(data);
 			    });
 	    */
-            getGuests(clientCookie).then(function (guests) {
+            getGuests(webSocket.cookie).then(function (guests) {
                 var data = JSON.stringify({'type' : 'urls', 'guests': guests});
                 console.log(data);
                 webSocket.send(data);
@@ -210,6 +212,6 @@ function recvMessage(webSocket, recvMsg){
             var data = JSON.stringify({'type' : 'echo', 'string' : 'This is Echo' });
             webSocket.send(data);
         }
-	resolve(clientCookie);
+	resolve();
     });
 }
