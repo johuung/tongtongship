@@ -181,7 +181,7 @@ function refreshGuests() {
 }
 
 function recvMessage(webSocket, recvMsg){
-<<<<<<< HEAD
+
 	return new Promise(function (resolve, reject) {
 		var json = JSON.parse(recvMsg);
 		switch(json.type) {
@@ -210,58 +210,21 @@ function recvMessage(webSocket, recvMsg){
 			case "answer":
 			case "candidate":
 				getWebSocket(json.data.destination).then(webSocket => {
-					signalingMessage(recvMsg, webSocket);
+				    signalingMessage(recvMsg, webSocket);
 				});	
 				break;
 		}
 		resolve();
 	});
-=======
-    return new Promise(function (resolve, reject) {
-	var json = JSON.parse(recvMsg);
-	
-	switch(json.type) {
-	case "screenshot":
-	    /*
-	      var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
-	      var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
-	      s3.upload(params, function(err, data){
-	      if (err) {
-	      console.log('error in callback');
-	      console.log(err);
-	      }
-	      console.log('success');
-	      console.log(data);
-	      });
-	    */
-	    getGuests(webSocket.cookie).then(function (guests) {
-		var data = JSON.stringify({'type' : 'urls', 'guests': guests});
-		console.log(data);
-		webSocket.send(data);
-	    });
-	    break;
-	case "request", "response", "offer", "answer", "candidate":
-	    getWebSocket(json.data.destination).then(cookie => {
-		signalingMessage(recvMsg, cookie).then(() => {
-		    
-		});
-	    });
-	    break;
-	}
-	
-	resolve();
-    });
->>>>>>> 1f088dac686f6fe568e79ac44cecad1771ff17fc
 }
 
 function getWebSocket(cookie) {
 	return new Promise(function (resolve, reject) {
 		wss.clients.forEach(function (item) {
 			if(item.cookie == cookie){
-				return item;
+			    resolve(item);
 			}
 		});
-		resolve();
 	});
 }
 
