@@ -9,21 +9,21 @@ var UserImages = models.UserImage;
 
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize('tongtongship', 'tongtongship', '20tongs!', {
-  host: 'tongtongdb.cek80gowrna6.ap-northeast-2.rds.amazonaws.com',
-  dialect: 'postgres',
-  operatorsAliases: false,
+    host: 'tongtongdb.cek80gowrna6.ap-northeast-2.rds.amazonaws.com',
+    dialect: 'postgres',
+    operatorsAliases: false,
 });
 
 const Op = Sequelize.Op;
 
 /*
-sequelize
+  sequelize
   .authenticate()
   .then(() => {
-    console.log('Connection has been established successfully.');
+  console.log('Connection has been established successfully.');
   })
   .catch(err => {
-    console.error('Unable to connect to the database:', err);
+  console.error('Unable to connect to the database:', err);
   });
 */
 
@@ -32,11 +32,11 @@ var myBucket = 'jehyunlims-bucket93';
 //var mySecKey = '';
 var AWS = require('aws-sdk');
 /*
-var s3 = new AWS.S3(
-    {accessKeyId: myKey,
-    secretAccessKey: mySecKey,
-    Bucket: myBucket}
-);
+  var s3 = new AWS.S3(
+  {accessKeyId: myKey,
+  secretAccessKey: mySecKey,
+  Bucket: myBucket}
+  );
 */
 
 app.use('/static', express.static(path.join(__dirname, 'public')))
@@ -56,12 +56,12 @@ const server = new http.createServer(app).listen(8080);
 const wss = new WebSocket.Server({ server: server, clientTracking: true });
 
 wss.on('connection', function connection(ws, req) {
-
+    
     reqCookies = cookie.parse(req.headers.cookie);
     ws.cookie = reqCookies['cookie'];
-
+    
     console.log(wss.clients);
-
+    
     ws.on('message', function incoming(message) {
 	recvMessage(ws, message);
     });
@@ -73,34 +73,34 @@ wss.on('connection', function connection(ws, req) {
 });
 
 function getRandomUsers(tempCookie) {
-
-	return new Promise(function (resolve, reject) {
-	    UserImages.findAll({where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]]})
-		.then(user => {
-			resolve(user);
-		});
-	});
-
+    
+    return new Promise(function (resolve, reject) {
+	UserImages.findAll({where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]]})
+	    .then(user => {
+		resolve(user);
+	    });
+    });
+    
 }
 
 function addUser(tempCookie) {
-
-  getRandomUsers(tempCookie).then(function (randomUsers) {
-
-  var info = {
-    cookie: tempCookie,
-    url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
-  };
-
-  for(var i=0; i<randomUsers.length; i++) {
-    info["guest" + String(i+1)] =  randomUsers[i].get('cookie');
-
-  }
-      UserImages.create(info).then(() => {
-	  refreshGuests();
-      });
-  console.log('add User complete');
+    
+    getRandomUsers(tempCookie).then(function (randomUsers) {
+	
+	var info = {
+	    cookie: tempCookie,
+	    url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
+	};
+	
+	for(var i=0; i<randomUsers.length; i++) {
+	    info["guest" + String(i+1)] =  randomUsers[i].get('cookie');
+	    
+	}
+	UserImages.create(info).then(() => {
+	    refreshGuests();
 	});
+	console.log('add User complete');
+    });
 }
 
 function deleteUser(cookie) {
@@ -110,20 +110,20 @@ function deleteUser(cookie) {
 }
 
 function getRandomCookie() {
-  var tempCookie;
-  var sw = true;
-
-  do {
-    tempCookie = randomString({length: 10});
-
-    UserImages.findOne({where: {cookie: tempCookie}})
-    .then((user) => {
-      sw = false;
-    });
-  }
-  while(sw == false);
-
-  return tempCookie;
+    var tempCookie;
+    var sw = true;
+    
+    do {
+	tempCookie = randomString({length: 10});
+	
+	UserImages.findOne({where: {cookie: tempCookie}})
+	    .then((user) => {
+		sw = false;
+	    });
+    }
+    while(sw == false);
+    
+    return tempCookie;
 }
 
 function getGuests(cookie) {
@@ -177,7 +177,7 @@ function fillNullGuest(user) {
 }
 
 function refreshGuests() {
-
+    
     getUsersHavingNullGuests().then(users => {
 	for (let i = 0; i < users.length; i++) {   
 	    fillNullGuest(users[i]);
@@ -186,42 +186,37 @@ function refreshGuests() {
 }
 
 function recvMessage(webSocket, recvMsg){
-  return new Promise(function (resolve, reject) {
-	  var json = JSON.parse(recvMsg);
-
-    switch(json.type) {
-      case "screenshot":
-        break;
-      case "request":
-        break;
-      case "response":
-        break;
-      case "offer", "answer", "candidate":
-        getWebSocket(json.data.destination).then(cookie => {
-          signalingMessage(recvMsg, cookie).then(() => {
+    return new Promise(function (resolve, reject) {
+	var json = JSON.parse(recvMsg);
+	
+	switch(json.type) {
+	case "screenshot":
             break;
-          });
-        });
-
-    }
-	  resolve();
-  });
+	case "request", "response", "offer", "answer", "candidate":
+            getWebSocket(json.data.destination).then(cookie => {
+		signalingMessage(recvMsg, cookie).then(() => {
+		    break;
+		});
+	    });	
+	}
+	resolve();
+    });
 }
 
 function getWebSocket(cookie) {
-  return new Promise(function (resolve, reject) {
-    wss.clients.forEach(function (item) {
-      if(item.cookie == cookie){
-        return item;
-      }
+    return new Promise(function (resolve, reject) {
+	wss.clients.forEach(function (item) {
+	    if(item.cookie == cookie){
+		return item;
+	    }
+	});
+	resolve();
     });
-    resolve();
-  });
 }
 
 function signalingMessage(message, destination) {
     return new Promise(function (resolve, reject) {
-      destination.send(message);
-      resolve();
+	destination.send(message);
+	resolve();
     });
 }
