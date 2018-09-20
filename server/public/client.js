@@ -8,11 +8,10 @@ for(var i = 0; i<9; i++){
 
 var test_text = new Array();
 for(var i=0; i<9; i++){
-	test_text[i] = document.getElementById("received_cookie_0"+i);
-	test_text[i].innerHTML = i+'hell\n';
+	test_text[i] = { "cookie": '', "htmlId" : document.getElementById("received_cookie_0"+i) };
+	test_text[i].htmlId.innerHTML = i+'hell\n';
+	test_text[i].htmlId.addEventListener('click', requestCall(test_text[i]),false);
 }
-
-var guestArr = new Array();
 
 var canvas = document.getElementById("screenshot");
 var ctx = canvas.getContext('2d');
@@ -77,11 +76,11 @@ function recvEvent(event){
 //                      image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
                         var guest_num = "guest"+String(i+1);
                         if (JSON.parse(event.data).guests[guest_num] == null) {
-                                test_text[i].innerHTML = "Guest #"+ String(i+1)+" is null";
+                                test_text[i].htmlId.innerHTML = "Guest #"+ String(i+1)+" is null";
                         }
                         else {
-                                test_text[i].innerHTML = JSON.parse(event.data).guests[guest_num];
-				guestArr[0] = JSON.parse(event.data).guests.guest1;
+                                test_text[i].htmlId.innerHTML = JSON.parse(event.data).guests[guest_num];
+				test_text[i].cookie = JSON.parse(event.data).guests.guests[guest_num];
                         }
                 }
 //              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
@@ -98,5 +97,9 @@ function recvEvent(event){
 }
 
 function hangUpCall(){
-	ws.send(JSON.stringify({"type" : 'request', "data" : { "target" : guestArr[0]} }));
+}
+
+function requestCall(target){
+//        ws.send(JSON.stringify({"type" : 'request', "data" : { "target" : targetCookie} }));
+	console.log(target.cookie);
 }
