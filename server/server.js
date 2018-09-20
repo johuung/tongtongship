@@ -184,33 +184,37 @@ function refreshGuests() {
 	}
     });
 }
+
 function recvMessage(webSocket, recvMsg){
-    return new Promise(function (resolve, reject) {
-	var json = JSON.parse(recvMsg);
-	
-        if(json.type=="screenshot"){
-	    
-	    /*              var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
-			    var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
-			    s3.upload(params, function(err, data){
-                            if (err) {
-                            console.log('error in callback');
-                            console.log(err);
-                            }
-                            console.log('success');
-                            console.log(data);
-			    });
-	    */
-            getGuests(webSocket.cookie).then(function (guests) {
-                var data = JSON.stringify({'type' : 'urls', 'guests': guests});
-                console.log(data);
-                webSocket.send(data);
-            });
-        }
-        else if(json.type=="button"){
-            var data = JSON.stringify({'type' : 'echo', 'string' : 'This is Echo' });
-            webSocket.send(data);
-        }
-	resolve();
+  return new Promise(function (resolve, reject) {
+	  var json = JSON.parse(recvMsg);
+
+    switch(json.type) {
+      case "screenshot":
+        break;
+      case "request":
+        break;
+      case "response":
+        break;
+      case "offer":
+        break;
+      case "answer":
+        break;
+      case "candidate":
+        break;
+
+    }
+	  resolve();
+  });
+}
+
+function getWebSocket(cookie) {
+  return new Promise(function (resolve, reject) {
+    wss.clients.forEach(function (item) {
+      if(item.cookie == cookie){
+        return item;
+      }
     });
+    resolve();
+  });
 }
