@@ -191,6 +191,23 @@ function recvMessage(webSocket, recvMsg){
 
     switch(json.type) {
       case "screenshot":
+        /*
+          var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+          var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
+          s3.upload(params, function(err, data){
+                            if (err) {
+                            console.log('error in callback');
+                            console.log(err);
+                            }
+                            console.log('success');
+                            console.log(data);
+          });
+        */
+        getGuests(webSocket.cookie).then(function (guests) {
+            var data = JSON.stringify({'type' : 'urls', 'guests': guests});
+            console.log(data);
+            webSocket.send(data);
+        });
         break;
       case "request":
         break;
