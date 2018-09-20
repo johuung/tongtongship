@@ -81,7 +81,7 @@ function getRandomUsers(tempCookie) {
 }
 
 function addUser(tempCookie) {
-	getRandomUsers(tempCookie).then(function (randomUsers) {
+    getRandomUsers(tempCookie).then(function (randomUsers) {
 		var info = {
 			cookie: tempCookie,
 			url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
@@ -181,6 +181,7 @@ function refreshGuests() {
 }
 
 function recvMessage(webSocket, recvMsg){
+<<<<<<< HEAD
 	return new Promise(function (resolve, reject) {
 		var json = JSON.parse(recvMsg);
 		switch(json.type) {
@@ -215,6 +216,42 @@ function recvMessage(webSocket, recvMsg){
 		}
 		resolve();
 	});
+=======
+    return new Promise(function (resolve, reject) {
+	var json = JSON.parse(recvMsg);
+	
+	switch(json.type) {
+	case "screenshot":
+	    /*
+	      var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+	      var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
+	      s3.upload(params, function(err, data){
+	      if (err) {
+	      console.log('error in callback');
+	      console.log(err);
+	      }
+	      console.log('success');
+	      console.log(data);
+	      });
+	    */
+	    getGuests(webSocket.cookie).then(function (guests) {
+		var data = JSON.stringify({'type' : 'urls', 'guests': guests});
+		console.log(data);
+		webSocket.send(data);
+	    });
+	    break;
+	case "request", "response", "offer", "answer", "candidate":
+	    getWebSocket(json.data.destination).then(cookie => {
+		signalingMessage(recvMsg, cookie).then(() => {
+		    
+		});
+	    });
+	    break;
+	}
+	
+	resolve();
+    });
+>>>>>>> 1f088dac686f6fe568e79ac44cecad1771ff17fc
 }
 
 function getWebSocket(cookie) {
