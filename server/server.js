@@ -184,6 +184,7 @@ function refreshGuests() {
 	}
     });
 }
+
 function recvMessage(webSocket, recvMsg){
     return new Promise(function (resolve, reject) {
 	var json = JSON.parse(recvMsg);
@@ -207,9 +208,15 @@ function recvMessage(webSocket, recvMsg){
                 webSocket.send(data);
             });
         }
-        else if(json.type=="button"){
+        else if(json.type=="request"){
+	    var mateCookie = json.data.target;
             var data = JSON.stringify({'type' : 'echo', 'string' : 'This is Echo' });
-            webSocket.send(data);
+      //      webSocket.send(data);
+	wss.clients.forEach(function (item) {
+		if(item.cookie == mateCookie){
+			item.send(data);
+		}
+	});
         }
 	resolve();
     });
