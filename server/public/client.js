@@ -71,29 +71,31 @@ function sendScreenshot() {
 }
 
 function recvEvent(event){
-        if(JSON.parse(event.data).type == 'urls'){
-                for(var i = 0; i<9; i++){
-//                      image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
-                        var guest_num = "guest"+String(i+1);
-                        if (JSON.parse(event.data).guests[guest_num] == null) {
-                                test_text[i].htmlId.innerHTML = "Guest #"+ String(i+1)+" is null";
-                        }
-                        else {
-                                test_text[i].htmlId.innerHTML = JSON.parse(event.data).guests[guest_num];
-				test_text[i].cookie = JSON.parse(event.data).guests.guests[guest_num];
-                        }
-                }
+	switch(JSON.parse(event.data).type){
+		case "urls":
+		
+			for(var i = 0; i<9; i++){
+//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
+                        	var guest_num = "guest"+String(i+1);
+                      		if (JSON.parse(event.data).guests[guest_num] == null) {
+                       	        	test_text[i].htmlId.innerHTML = "Guest #"+ String(i+1)+" is null";
+                     	  	}
+                       	 	else {
+                                	test_text[i].htmlId.innerHTML = JSON.parse(event.data).guests[guest_num];
+					test_text[i].cookie = JSON.parse(event.data).guests.guests[guest_num];
+                        	}
+                	}
 //              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
-        }
-        else if(JSON.parse(event.data).type == 'echo'){
-                var confirmflag = confirm(JSON.parse(event.data).string);
-                if(confirmflag){
-                        console.log('ok');
-                }
-                else{
-                        console.log('cancle');
-                }
-        }
+
+		case "echo":	
+                	var confirmflag = confirm(JSON.parse(event.data).string);
+                	if(confirmflag){
+                        	console.log('ok');
+                	}
+                	else{
+                       		console.log('cancle');
+                	}
+	}
 }
 
 function hangUpCall(){
