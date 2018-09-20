@@ -181,38 +181,40 @@ function refreshGuests() {
 }
 
 function recvMessage(webSocket, recvMsg){
-	return new Promise(function (resolve, reject) {
-		var json = JSON.parse(recvMsg);
-
-		switch(json.type) {
-			case "screenshot":
-				/*
-				var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
-				var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
-				s3.upload(params, function(err, data){
-					if (err) {
-						console.log('error in callback');
-						console.log(err);
-					}
-					console.log('success');
-					console.log(data);
-				});
-				*/
-				getGuests(webSocket.cookie).then(function (guests) {
-					var data = JSON.stringify({'type' : 'urls', 'guests': guests});
-					console.log(data);
-					webSocket.send(data);
-				});
-				break;
-			case "request", "response", "offer", "answer", "candidate":
-				getWebSocket(json.data.destination).then(cookie => {
-				signalingMessage(recvMsg, cookie).then(() => {
-					break;
-				});
-			});	
-		}
-		resolve();
-	});
+    return new Promise(function (resolve, reject) {
+	var json = JSON.parse(recvMsg);
+	
+	switch(json.type) {
+	case "screenshot":
+	    /*
+	      var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+	      var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
+	      s3.upload(params, function(err, data){
+	      if (err) {
+	      console.log('error in callback');
+	      console.log(err);
+	      }
+	      console.log('success');
+	      console.log(data);
+	      });
+	    */
+	    getGuests(webSocket.cookie).then(function (guests) {
+		var data = JSON.stringify({'type' : 'urls', 'guests': guests});
+		console.log(data);
+		webSocket.send(data);
+	    });
+	    break;
+	case "request", "response", "offer", "answer", "candidate":
+	    getWebSocket(json.data.destination).then(cookie => {
+		signalingMessage(recvMsg, cookie).then(() => {
+		    
+		});
+	    });
+	    break;
+	}
+	
+	resolve();
+    });
 }
 
 function getWebSocket(cookie) {
