@@ -103,6 +103,7 @@ function handleMessageEvent(event){
 	break;
     case "answer":
 	handleAnswerMessage(message);
+	break;
     }
 }
 
