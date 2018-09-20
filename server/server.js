@@ -183,11 +183,10 @@ function refreshGuests() {
 function recvMessage(webSocket, recvMsg){
 	return new Promise(function (resolve, reject) {
 		var json = JSON.parse(recvMsg);
-
 		switch(json.type) {
 			case "screenshot":
 				/*
-				var buf = new Buffer(json.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+				var buf = new Buffer(json.data.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
 				var params = { Bucket: myBucket, Key: clientCookie + '.jpeg', ContentEncoding: 'base64', ContentType: 'image/jpeg', Body: buf };
 				s3.upload(params, function(err, data){
 					if (err) {
@@ -204,12 +203,15 @@ function recvMessage(webSocket, recvMsg){
 					webSocket.send(data);
 				});
 				break;
-			case "request", "response", "offer", "answer", "candidate":
-				getWebSocket(json.data.destination).then(cookie => {
-				signalingMessage(recvMsg, cookie).then(() => {
-					break;
-				});
-			});	
+			case "request": 
+			case "response":
+			case "offer":
+			case "answer":
+			case "candidate":
+				getWebSocket(json.data.destination).then(webSocket => {
+					signalingMessage(recvMsg, webSocket);
+				});	
+				break;
 		}
 		resolve();
 	});

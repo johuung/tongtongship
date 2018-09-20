@@ -8,9 +8,9 @@ for(var i = 0; i<9; i++){
 
 var test_text = new Array();
 for(var i=0; i<9; i++){
-	test_text[i] = { "cookie": '', "htmlId" : document.getElementById("received_cookie_0"+i) };
+	test_text[i] = { "cookie" : '', "htmlId" : document.getElementById("received_cookie_0"+i)};
 	test_text[i].htmlId.innerHTML = i+'hell\n';
-	test_text[i].htmlId.addEventListener('click', requestCall(test_text[i]),false);
+	test_text[i].htmlId.addEventListener('click', function(event){ requestCall(event.target.id)});
 }
 
 var canvas = document.getElementById("screenshot");
@@ -73,7 +73,6 @@ function sendScreenshot() {
 function recvEvent(event){
 	switch(JSON.parse(event.data).type){
 		case "urls":
-		
 			for(var i = 0; i<9; i++){
 //				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
                         	var guest_num = "guest"+String(i+1);
@@ -82,10 +81,11 @@ function recvEvent(event){
                      	  	}
                        	 	else {
                                 	test_text[i].htmlId.innerHTML = JSON.parse(event.data).guests[guest_num];
-					test_text[i].cookie = JSON.parse(event.data).guests.guests[guest_num];
+					test_text[i].cookie = JSON.parse(event.data).guests[guest_num];
                         	}
                 	}
 //              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
+			break;
 
 		case "echo":	
                 	var confirmflag = confirm(JSON.parse(event.data).string);
@@ -95,14 +95,16 @@ function recvEvent(event){
                 	else{
                        		console.log('cancle');
                 	}
+			break;
 	}
 }
 
 function hangUpCall(){
 }
 
-function requestCall(target){
-//        ws.send(JSON.stringify({"type" : 'request', "data" : { "target" : targetCookie} }));
-	console.log(target.cookie);
+function requestCall( targetId ){
+//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
+	console.log('fiuck');
+	ws.send(JSON.stringify({"type" : "request", "data" : { "destination" : test_text[targetId.split('_0')[1]].cookie}}));
 }
 
