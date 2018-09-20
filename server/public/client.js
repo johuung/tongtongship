@@ -17,12 +17,14 @@ var canvas = document.getElementById("screenshot");
 var ctx = canvas.getContext('2d');
 
 var peerConnection = null;
+var callSource = document.cookie.replace(/(?:(?:^|.*;\s*)cookie\s*\=\s*([^;]*).*$)|^.*$/, "$1");;
+var callDestination = null;
 
 ws.onopen = function(event) {
     console.log("Connected!");
 }
 
-ws.onmessage = handleOnMessageEvent;
+ws.onmessage = handleMessageEvent;
 
 // error event handler
 ws.onerror = function(event) {
@@ -70,7 +72,7 @@ function sendScreenshot() {
     }
 }
 
-function handleOnMessageEvent(event){
+function handleMessageEvent(event){
     var message = JSON.parse(event.data);
     switch(message.type){
     case "urls":
@@ -115,6 +117,9 @@ function requestCall(target){
 
 function handleOfferMessage(message) {
 
+    /* Set Destination to message.data.source */
+    callDestination = message.data.source;
+    
     /* Create peerConnection */
     if (peerConnection != null) {
 	console.log('u have already opened RTCPeerConnection');
@@ -137,12 +142,27 @@ function handleOfferMessage(message) {
 		}
 	    ]
 	});
+
+	peerConnection.onicecandidate = handleICECandidateEvent;
     }
 
     var description = new RTCSessionDescription(message.data.sdp);
 
     peerConnection.setRemoteDescription(description).then(function() {
 	return peerConnection.addStream(video.srcObject);
+    }).then(() => {
+	return peerConnection.createAnswer();
+    }).then((answer) => {
+	peerConnection.setLocalDescription(answer);
+    }).then(() => {
+	ws.send({
+	    type: "answer",
+	    data: {
+		source: callSource,
+		destination: callDestination,
+		sdp: myPeerConnection.localDescription
+	    }
+	}.toString());
     });
     
 }
@@ -153,4 +173,16 @@ function handleAnswerMessage(message) {
 
     peerConnection.setRemoteDescription(description);
 
+}
+
+function handleICECandidateEvent(event) {
+
+    if (event.candidate) {
+	ws.send({
+	    type: "candidate",
+	    target: callDestination,
+	    candidate: event.candidate
+	}.toString());
+    }
+    
 }
