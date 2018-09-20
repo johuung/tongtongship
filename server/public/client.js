@@ -12,6 +12,8 @@ for(var i=0; i<9; i++){
 	test_text[i].innerHTML = i+'hell\n';
 }
 
+var guestArr = new Array();
+
 var canvas = document.getElementById("screenshot");
 var ctx = canvas.getContext('2d');
 
@@ -63,7 +65,7 @@ function sendScreenshot() {
     try {
 	let screenshot = ctx.drawImage(video, 0, 0);
 	img = canvas.toDataURL('image/jpeg', 0.1);
-	ws.send(JSON.stringify({ "type" : "screenshot", "image" : img }));
+	ws.send(JSON.stringify({ "type" : "screenshot", "data" : { "image" : img } }));
     } catch (e) {
 	console.log('Unable to acquire screenshot: ' + e);
     }
@@ -79,6 +81,7 @@ function recvEvent(event){
                         }
                         else {
                                 test_text[i].innerHTML = JSON.parse(event.data).guests[guest_num];
+				guestArr[0] = JSON.parse(event.data).guests.guest1;
                         }
                 }
 //              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
@@ -95,5 +98,6 @@ function recvEvent(event){
 }
 
 function hangUpCall(){
-	ws.send(JSON.stringify({"type" : 'button'}));
+	ws.send(JSON.stringify({"type" : 'request', "data" : { "target" : guestArr[0]} }));
 }
+

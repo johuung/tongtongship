@@ -196,12 +196,12 @@ function recvMessage(webSocket, recvMsg){
         break;
       case "response":
         break;
-      case "offer":
-        break;
-      case "answer":
-        break;
-      case "candidate":
-        break;
+      case "offer", "answer", "candidate":
+        getWebSocket(json.data.destination).then(cookie => {
+          signalingMessage(recvMsg, cookie).then(() => {
+            break;
+          });
+        });
 
     }
 	  resolve();
@@ -217,4 +217,11 @@ function getWebSocket(cookie) {
     });
     resolve();
   });
+}
+
+function signalingMessage(message, destination) {
+    return new Promise(function (resolve, reject) {
+      destination.send(message);
+      resolve();
+    });
 }
