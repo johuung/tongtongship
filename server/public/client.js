@@ -22,7 +22,7 @@ ws.onopen = function(event) {
     console.log("Connected!");
 }
 
-ws.onmessage = handleMessageEvent;
+ws.onmessage = handleOnMessageEvent;
 
 // error event handler
 ws.onerror = function(event) {
@@ -70,7 +70,7 @@ function sendScreenshot() {
     }
 }
 
-function handleMessageEvent(event){
+function handleOnMessageEvent(event){
     var message = JSON.parse(event.data);
     switch(message.type){
     case "urls":
