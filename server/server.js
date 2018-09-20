@@ -81,7 +81,7 @@ function getRandomUsers(tempCookie) {
 }
 
 function addUser(tempCookie) {
-	getRandomUsers(tempCookie).then(function (randomUsers) {
+    getRandomUsers(tempCookie).then(function (randomUsers) {
 		var info = {
 			cookie: tempCookie,
 			url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
