@@ -89,14 +89,10 @@ function handleMessageEvent(event){
 		}
 		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 		break;
-		case "echo":
-		var confirmflag = confirm(JSON.parse(event.data).string);
-		if(confirmflag){
-			console.log('ok');
-		}
-		else{
-			console.log('cancle');
-		}
+		case "request":
+		break;
+		case "response":
+		handleResponseMessage(message);
 		break;
 		case "offer":
 		handleOfferMessage(message);
@@ -114,6 +110,22 @@ function requestCall( targetId ){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	console.log('fiuck');
 	ws.send(JSON.stringify({"type" : "request", "data" : { "destination" : test_text[targetId.split('_0')[1]].cookie}}));
+}
+
+function handleResponseMessage(message) {
+
+	/* Check ACK or NAK */
+	if (message.data.accept == true) { //ACK
+		callDestination = message.data.source;
+		// ...	
+	}
+	else { // NAK
+
+	}
+
+
+	/* Create peerConnection */
+
 }
 
 function handleOfferMessage(message) {
@@ -147,8 +159,8 @@ function handleOfferMessage(message) {
 		peerConnection.onicecandidate = handleICECandidateEvent;
 	}
 
+	/* Set RemoteDescription & Create and Send Answer */
 	var description = new RTCSessionDescription(message.data.sdp);
-
 	peerConnection.setRemoteDescription(description).then(function() {
 		return peerConnection.addStream(video.srcObject);
 	}).then(() => {
@@ -161,7 +173,7 @@ function handleOfferMessage(message) {
 			data: {
 				source: callSource,
 				destination: callDestination,
-				sdp: myPeerConnection.localDescription
+				sdp: peerConnection.localDescription
 			}
 		}.toString());
 	});
@@ -181,9 +193,27 @@ function handleICECandidateEvent(event) {
 	if (event.candidate) {
 		ws.send({
 			type: "candidate",
-			target: callDestination,
-			candidate: event.candidate
+			data: {
+				destination: callDestination,
+				candidate: event.candidate
+			}
 		}.toString());
 	}
+
+}
+
+function handleNegotiationNeededEvent(event) {
+
+	peerConnection.createOffer().then(offer => {
+		peerConnection.setLocalDescription(offer);
+	}).then(() => {
+		ws.send({
+			type: "offer",
+			data: {
+				source: callSource,
+				destination: callDestination
+			}
+		}.toString());
+	});
 
 }
