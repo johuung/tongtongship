@@ -214,3 +214,9 @@ function recvMessage(webSocket, recvMsg){
 	resolve();
     });
 }
+
+function signalingMessage(message, destination) {
+    return new Promise(function (resolve, reject) {
+	destination.send(message);
+    }
+}

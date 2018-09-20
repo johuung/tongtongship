@@ -97,3 +97,4 @@ function recvEvent(event){
 function hangUpCall(){
 	ws.send(JSON.stringify({"type" : 'button'}));
 }
+
