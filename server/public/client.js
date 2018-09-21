@@ -44,7 +44,6 @@ const constraints = {
 
 navigator.mediaDevices.getUserMedia(constraints)
 .then(function(localStream) {
-	localVideo = localStream;
 	localVideo.srcObject = localStream;
 
 	setInterval(function() {
@@ -189,7 +188,7 @@ function handleResponseMessage(message) {
 			peerConnection.onicecandidate = handleICECandidateEvent;
 		}
 
-		peerConnection.addStream(localStream);
+		peerConnection.addStream(localVideo.srcObject);
 
 	}
 	else { // NAK
@@ -237,7 +236,7 @@ function handleOfferMessage(message) {
 	/* Set RemoteDescription & Create and Send Answer */
 	var description = new RTCSessionDescription(message.data.sdp);
 	peerConnection.setRemoteDescription(description).then(function() {
-		return peerConnection.addStream(localVideo);
+		return peerConnection.addStream(localVideo.srcObject);
 	}).then(() => {
 		return peerConnection.createAnswer();
 	}).then((answer) => {
