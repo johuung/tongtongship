@@ -84,12 +84,12 @@ function handleMessageEvent(event){
             }
             else {
                 test_text[i].htmlId.innerHTML = message.guests[guest_num];
-		test_text[i].cookie = message.guests.guests[guest_num];
+		test_text[i].cookie = message.guests[guest_num];
             }
         }
 	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 	break;
-    case "echo":	
+    case "request":	
         var confirmflag = confirm(JSON.parse(event.data).string);
         if(confirmflag){
             console.log('ok');
@@ -112,7 +112,11 @@ function hangUpCall(){
 function requestCall( targetId ){
 //        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	console.log('fiuck');
-	ws.send(JSON.stringify({"type" : "request", "data" : { "destination" : test_text[targetId.split('_0')[1]].cookie}}));
+	if(test_text[targetId.split('_0')[1]].cookie != ''){
+		ws.send(JSON.stringify({"type" : "request", "data" : { "destination" : test_text[targetId.split('_0')[1]].cookie}}));
+		console.log('send success');
+	}
+
 }
 
 function handleOfferMessage(message) {

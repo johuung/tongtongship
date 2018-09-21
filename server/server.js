@@ -184,6 +184,9 @@ function recvMessage(webSocket, recvMsg){
 
 	return new Promise(function (resolve, reject) {
 		var json = JSON.parse(recvMsg);
+
+	console.log(json);
+
 		switch(json.type) {
 			case "screenshot":
 				/*
@@ -209,6 +212,7 @@ function recvMessage(webSocket, recvMsg){
 			case "offer":
 			case "answer":
 			case "candidate":
+				console.log("######");
 				getWebSocket(json.data.destination).then(webSocket => {
 				    signalingMessage(recvMsg, webSocket);
 				});	
@@ -231,6 +235,7 @@ function getWebSocket(cookie) {
 function signalingMessage(message, destination) {
 	return new Promise(function (resolve, reject) {
 		destination.send(message);
+		console.log("!!!!!!!!!!!!!!!!!!!!!"+message.toString);
 		resolve();
 	});
 }
