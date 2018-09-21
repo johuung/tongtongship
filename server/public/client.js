@@ -10,12 +10,13 @@ for(var i = 0; i<9; i++){
 */
 var guest_box = document.getElementById("camera-container");
 
-var test_text = new Array();
+var guestArr = new Array();
+
 for(var i=0; i<9; i++){
-	test_text[i] = document.createElement('h3');
-	test_text[i].innerHTML = i+'hell\n';
-	guest_box.appendChild(test_text[i]);
-	test_text[i].addEventListener('click', function(event){ console.log(event.target.id); handleRequestClick(event.target.id)});
+	guestArr[i] = document.createElement('h3');
+	guestArr[i].innerHTML = "Blank #"+(i+1)+"\n";
+	guest_box.appendChild(guestArr[i]);
+	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
 
 var canvas = document.getElementById("screenshot");
@@ -72,7 +73,13 @@ function sendScreenshot() {
 	try {
 		let screenshot = ctx.drawImage(localVideo, 0, 0);
 		img = canvas.toDataURL('image/jpeg', 0.1);
-		ws.send(JSON.stringify({ "type" : "screenshot", "data" : { "image" : img } }));
+		ws.send(JSON.stringify({
+			"type": "screenshot",
+			"data": {
+				"image": img
+			}
+		}));
+
 	} catch (e) {
 		console.log('Unable to acquire screenshot: ' + e);
 	}
@@ -83,29 +90,9 @@ function handleMessageEvent(event){
 
 	switch(message.type){
 		case "urls":
-		for(var i = 0; i<9; i++){
-			//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
-			var guest_num = "guest"+String(i+1);
-			if (message.guests[guest_num] == null) {
-				test_text[i].innerHTML = "Guest #"+ String(i+1)+" is null";
-			}
-			else {
-				test_text[i].innerHTML = "Guest #" + String(i+1)+ " is " + message.guests[guest_num];
-				test_text[i].id = message.guests[guest_num];
-			}
-		}
-		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
+		handleUrlsMessage(message);
 		break;
 		case "request":
-		/*
-		var confirmflag = confirm(JSON.parse(event.data).string);
-		if(confirmflag){
-				console.log('ok');
-		}
-		else{
-				console.log('cancle');
-		}
-		*/
 		handleRequestMessage(message);
 		break;
 		case "response":
@@ -127,7 +114,13 @@ function hangUpCall(){
 function handleRequestClick(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	if(targetId!= ''){
-		ws.send(JSON.stringify({"type" : "request", "data" : {"source" : callSource, "destination" : targetId }}));
+		ws.send(JSON.stringify({
+			"type": "request",
+			"data": {
+				"source": callSource,
+				"destination" : targetId
+				}
+			}));
 		console.log('send success to : ' + targetId);
 	}
 }
@@ -138,24 +131,24 @@ function handleRequestMessage(message) {
 
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
-			ws.send({
-				"type" : "response",
-				"data" : {
-					"accept" : true,
-					"source" : callSource,
-					"destination" : message.data.source
+			ws.send(JSON.stringify({
+				"type": "response",
+				"data": {
+					"accept": true,
+					"source": callSource,
+					"destination": message.data.source
 				}
-			}.toString());
+			}));
 	}
 	else{ //if NAK
-		ws.send({
-			"type" : "response",
-			"data" : {
-				"accept" : false,
-				"source" : callSource,
-				"destination" : message.data.source
-			}
-		}.toString());
+			ws.send(JSON.stringify({
+				"type": "response",
+				"data": {
+					"false": true,
+					"source": callSource,
+					"destination": message.data.source
+				}
+			}));
 	}
 }
 
@@ -250,14 +243,14 @@ function handleOfferMessage(message) {
 	}).then((answer) => {
 		peerConnection.setLocalDescription(answer);
 	}).then(() => {
-		ws.send({
+		ws.send(JSON.stringify({
 			type: "answer",
 			data: {
 				source: callSource,
 				destination: callDestination,
 				sdp: peerConnection.localDescription
 			}
-		}.toString());
+		}));
 	});
 
 }
@@ -273,13 +266,13 @@ function handleAnswerMessage(message) {
 function handleICECandidateEvent(event) {
 
 	if (event.candidate) {
-		ws.send({
+		ws.send(JSON.stringify({
 			type: "candidate",
 			data: {
 				destination: callDestination,
 				candidate: event.candidate
 			}
-		}.toString());
+		}));
 	}
 
 }
@@ -289,13 +282,13 @@ function handleNegotiationNeededEvent(event) {
 	peerConnection.createOffer().then(offer => {
 		peerConnection.setLocalDescription(offer);
 	}).then(() => {
-		ws.send({
+		ws.send(JSON.stringify({
 			type: "offer",
 			data: {
 				source: callSource,
 				destination: callDestination
 			}
-		}.toString());
+		}));
 	});
 
 }
@@ -318,5 +311,22 @@ function loadCallPage() {
 
 	document.getElementById("camara-div").appendChild(localVideo);
 	document.getElementById("camara-div").appendChild(remoteVideo);
+
+}
+
+function handleUrlsMessage(message){
+
+	for(var i = 0; i<9; i++){
+		//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
+		var guest_num = "guest"+String(i+1);
+		if (message.guests[guest_num] == null) {
+			guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is null";
+		}
+		else {
+			guestArr[i].innerHTML = "Guest #" + String(i+1)+ " is " + message.guests[guest_num];
+			guestArr[i].id = message.guests[guest_num];
+		}
+	}
+	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 
 }
