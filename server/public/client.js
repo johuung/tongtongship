@@ -13,7 +13,7 @@ for(var i=0; i<9; i++){
 	test_text[i] = document.createElement('h3');
 	test_text[i].innerHTML = i+'hell\n';
 	guest_box.appendChild(test_text[i]);
-	test_text[i].addEventListener('click', function(event){ console.log(event.target.id); requestCall(event.target.id)});
+	test_text[i].addEventListener('click', function(event){ console.log(event.target.id); handleRequestClick(event.target.id)});
 }
 
 var canvas = document.getElementById("screenshot");
@@ -122,7 +122,7 @@ function handleMessageEvent(event){
 function hangUpCall(){
 }
 
-function requestCall(targetId){
+function handleRequestClick(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	if(targetId!= ''){
 		ws.send(JSON.stringify({"type" : "request", "data" : {"source" : callSource, "destination" : targetId }}));
