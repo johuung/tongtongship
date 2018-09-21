@@ -14,8 +14,8 @@ var guestArr = new Array();
 
 for(var i=0; i<9; i++){
 	guestArr[i] = document.createElement('h3');
-	guestArr[i].id = "First_blank";
-	guestArr[i].innerHTML = guestArr[i].id+" #"+(i+1)+"\n";
+	guestArr[i].id = "First_blank"+(i+1);
+	guestArr[i].innerHTML = guestArr[i].id+"\n";
 	guest_box.appendChild(guestArr[i]);
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
@@ -319,11 +319,11 @@ function handleUrlsMessage(message){
 	for(var i = 0; i<9; i++){
 		//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
 		var guest_num = "guest"+String(i+1);
-		if(message.guests[guest_num] == null){
-			guestArr[i].id = "blank";
+		if(message.data.guests[guest_num] == null){
+			guestArr[i].id = "blank"+(i+1);
 		}
 		else {
-			guestArr[i].id = message.guests[guest_num];
+			guestArr[i].id = message.data.guests[guest_num];
 		}
 		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
 	}

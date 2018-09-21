@@ -209,7 +209,12 @@ function recvMessage(webSocket, recvMsg){
 				});
 				*/
 				getGuests(webSocket.cookie).then(function (guests) {
-					var data = JSON.stringify({'type' : 'urls', 'guests': guests});
+					var data = JSON.stringify({
+						"type": 'urls',
+						"data": {
+							"guests": guests
+						}
+					});
 					console.log(data);
 					webSocket.send(data);
 				});
