@@ -72,7 +72,13 @@ function sendScreenshot() {
 	try {
 		let screenshot = ctx.drawImage(video, 0, 0);
 		img = canvas.toDataURL('image/jpeg', 0.1);
-		ws.send(JSON.stringify({ "type" : "screenshot", "data" : { "image" : img } }));
+		ws.send(JSON.stringify({
+			"type": "screenshot",
+			"data": {
+				"image": img
+			}
+		}));
+
 	} catch (e) {
 		console.log('Unable to acquire screenshot: ' + e);
 	}
@@ -107,7 +113,13 @@ function hangUpCall(){
 function handleRequestClick(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	if(targetId!= ''){
-		ws.send(JSON.stringify({"type" : "request", "data" : {"source" : callSource, "destination" : targetId }}));
+		ws.send(JSON.stringify({
+			"type": "request",
+			"data": {
+				"source": callSource,
+				"destination" : targetId
+				}
+			}));
 		console.log('send success to : ' + targetId);
 	}
 }
@@ -118,10 +130,24 @@ function handleRequestMessage(message) {
 
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
-			ws.send(JSON.stringify({"type" : "response", "data" : {"accept" : true, "source" : callSource, "destination" : message.data.source}}));
+			ws.send(JSON.stringify({
+				"type": "response",
+				"data": {
+					"accept": true,
+					"source": callSource,
+					"destination": message.data.source
+				}
+			}));
 	}
 	else{ //if NAK
-			ws.send(JSON.stringify({"type" : "response", "data" : {"false" : true, "source" : callSource, "destination" : message.data.source}}));
+			ws.send(JSON.stringify({
+				"type": "response",
+				"data": {
+					"false": true,
+					"source": callSource,
+					"destination": message.data.source
+				}
+			}));
 	}
 }
 
@@ -182,14 +208,14 @@ function handleOfferMessage(message) {
 	}).then((answer) => {
 		peerConnection.setLocalDescription(answer);
 	}).then(() => {
-		ws.send({
+		ws.send(JSON.stringify({
 			type: "answer",
 			data: {
 				source: callSource,
 				destination: callDestination,
 				sdp: peerConnection.localDescription
 			}
-		}.toString());
+		}));
 	});
 
 }
@@ -205,13 +231,13 @@ function handleAnswerMessage(message) {
 function handleICECandidateEvent(event) {
 
 	if (event.candidate) {
-		ws.send({
+		ws.send(JSON.stringify({
 			type: "candidate",
 			data: {
 				destination: callDestination,
 				candidate: event.candidate
 			}
-		}.toString());
+		}));
 	}
 
 }
@@ -221,13 +247,13 @@ function handleNegotiationNeededEvent(event) {
 	peerConnection.createOffer().then(offer => {
 		peerConnection.setLocalDescription(offer);
 	}).then(() => {
-		ws.send({
+		ws.send(JSON.stringify({
 			type: "offer",
 			data: {
 				source: callSource,
 				destination: callDestination
 			}
-		}.toString());
+		}));
 	});
 
 }
