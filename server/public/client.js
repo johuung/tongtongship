@@ -86,11 +86,11 @@ function handleMessageEvent(event){
 			//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
 			var guest_num = "guest"+String(i+1);
 			if (message.guests[guest_num] == null) {
-				test_text[i].htmlId.innerHTML = "Guest #"+ String(i+1)+" is null";
+				test_text[i].innerHTML = "Guest #"+ String(i+1)+" is null";
 			}
 			else {
-				test_text[i].htmlId.innerHTML = message.guests[guest_num];
-				test_text[i].cookie = message.guests[guest_num];
+				test_text[i].innerHTML = "Guest #" + String(i+1)+ " is " + message.guests[guest_num];
+				test_text[i].id = message.guests[guest_num];
 			}
 		}
 		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
@@ -125,7 +125,6 @@ function hangUpCall(){
 
 function handleRequestClick(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
-	console.log('fiuck');
 	if(targetId!= ''){
 		ws.send(JSON.stringify({"type" : "request", "data" : {"source" : callSource, "destination" : targetId }}));
 		console.log('send success to : ' + targetId);
