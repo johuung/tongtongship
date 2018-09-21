@@ -219,8 +219,8 @@ function recvMessage(webSocket, recvMsg){
 			case "offer":
 			case "answer":
 			case "candidate":
-				console.log("######");
 				getWebSocket(json.data.destination).then(webSocket => {
+						console.log(json.data.source);
 				    signalingMessage(recvMsg, webSocket);
 				});
 				break;
@@ -242,7 +242,6 @@ function getWebSocket(cookie) {
 function signalingMessage(message, destination) {
 	return new Promise(function (resolve, reject) {
 		destination.send(message);
-		console.log("!!!!!!!!!!!!!!!!!!!!!"+message.toString);
 		resolve();
 	});
 }

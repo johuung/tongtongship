@@ -1,16 +1,19 @@
 var ws = new WebSocket("ws://localhost:8080");
 var video = document.getElementById("local_video");
-
+/*
 var image = new Array();
 for(var i = 0; i<9; i++){
 	image[i] = document.getElementById("received_video_0"+i);
 }
+*/
+var guest_box = document.getElementById("camera-container");
 
 var test_text = new Array();
 for(var i=0; i<9; i++){
-	test_text[i] = { "cookie" : '', "htmlId" : document.getElementById("received_cookie_0"+i)};
-	test_text[i].htmlId.innerHTML = i+'hell\n';
-	test_text[i].htmlId.addEventListener('click', function(event){ requestCall(event.target.id)});
+	test_text[i] = document.createElement('h3');
+	test_text[i].innerHTML = i+'hell\n';
+	guest_box.appendChild(test_text[i]);
+	test_text[i].addEventListener('click', function(event){ console.log(event.target.id); requestCall(event.target.id)});
 }
 
 var canvas = document.getElementById("screenshot");
@@ -80,11 +83,11 @@ function handleMessageEvent(event){
 			//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
 			var guest_num = "guest"+String(i+1);
 			if (message.guests[guest_num] == null) {
-				test_text[i].htmlId.innerHTML = "Guest #"+ String(i+1)+" is null";
+				test_text[i].innerHTML = "Guest #"+ String(i+1)+" is null";
 			}
 			else {
-				test_text[i].htmlId.innerHTML = message.guests[guest_num];
-				test_text[i].cookie = message.guests.guests[guest_num];
+				test_text[i].innerHTML = "Guest #" + String(i+1)+ " is " + message.guests[guest_num];
+				test_text[i].id = message.guests[guest_num];
 			}
 		}
 		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
@@ -116,9 +119,9 @@ function hangUpCall(){
 
 function requestCall( targetId ){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
-	console.log('fiuck');
-	if(test_text[targetId.split('_0')[1]].cookie != ''){
-		ws.send(JSON.stringify({"type" : "request", "data" : { "destination" : test_text[targetId.split('_0')[1]].cookie}}));
+	console.log(targetId);
+	if(targetId != ''){
+		ws.send(JSON.stringify({"type" : "request", "data" : { "source" : callSource, "destination" : targetId }}));
 		console.log('send success');
 	}
 
