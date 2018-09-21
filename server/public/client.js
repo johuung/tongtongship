@@ -9,12 +9,13 @@ for(var i = 0; i<9; i++){
 */
 var guest_box = document.getElementById("camera-container");
 
-var test_text = new Array();
+var guestArr = new Array();
+
 for(var i=0; i<9; i++){
-	test_text[i] = document.createElement('h3');
-	test_text[i].innerHTML = i+'hell\n';
-	guest_box.appendChild(test_text[i]);
-	test_text[i].addEventListener('click', function(event){ console.log(event.target.id); handleRequestClick(event.target.id)});
+	guestArr[i] = document.createElement('h3');
+	guestArr[i].innerHTML = "Blank #"+(i+1)+"\n";
+	guest_box.appendChild(guestArr[i]);
+	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
 
 var canvas = document.getElementById("screenshot");
@@ -82,29 +83,8 @@ function handleMessageEvent(event){
 
 	switch(message.type){
 		case "urls":
-		for(var i = 0; i<9; i++){
-			//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
-			var guest_num = "guest"+String(i+1);
-			if (message.guests[guest_num] == null) {
-				test_text[i].innerHTML = "Guest #"+ String(i+1)+" is null";
-			}
-			else {
-				test_text[i].innerHTML = "Guest #" + String(i+1)+ " is " + message.guests[guest_num];
-				test_text[i].id = message.guests[guest_num];
-			}
-		}
-		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
-		break;
+				break;
 		case "request":
-		/*
-		var confirmflag = confirm(JSON.parse(event.data).string);
-		if(confirmflag){
-				console.log('ok');
-		}
-		else{
-				console.log('cancle');
-		}
-		*/
 		handleRequestMessage(message);
 		break;
 		case "response":
@@ -269,5 +249,22 @@ function loadCallPage() {
 
 	document.getElementById("camara-div").appendChild(localVideo);
 	document.getElementById("camara-div").appendChild(remoteVideo);
+
+}
+
+function handleUrlsMessage(message){
+
+	for(var i = 0; i<9; i++){
+		//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
+		var guest_num = "guest"+String(i+1);
+		if (message.guests[guest_num] == null) {
+			guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is null";
+		}
+		else {
+			guestArr[i].innerHTML = "Guest #" + String(i+1)+ " is " + message.guests[guest_num];
+			guestArr[i].id = message.guests[guest_num];
+		}
+	}
+	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 
 }
