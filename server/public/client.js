@@ -25,6 +25,7 @@ var callDestination = null;
 
 ws.onopen = function(event) {
 	console.log("Connected!");
+	console.log("my cookie : " + callSource)
 }
 
 ws.onmessage = handleMessageEvent;
@@ -77,6 +78,7 @@ function sendScreenshot() {
 
 function handleMessageEvent(event){
 	var message = JSON.parse(event.data);
+
 	switch(message.type){
 		case "urls":
 		for(var i = 0; i<9; i++){
@@ -93,13 +95,16 @@ function handleMessageEvent(event){
 		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 		break;
 		case "request":
-			var confirmflag = confirm(JSON.parse(event.data).string);
-			if(confirmflag){
-					console.log('ok');
-			}
-			else{
-					console.log('cancle');
-			}
+		/*
+		var confirmflag = confirm(JSON.parse(event.data).string);
+		if(confirmflag){
+				console.log('ok');
+		}
+		else{
+				console.log('cancle');
+		}
+		*/
+		handleRequestMessage(message);
 		break;
 		case "response":
 		handleResponseMessage(message);
@@ -117,24 +122,37 @@ function handleMessageEvent(event){
 function hangUpCall(){
 }
 
-function requestCall( targetId ){
+function requestCall(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
-	console.log(targetId);
-	if(targetId != ''){
-		ws.send(JSON.stringify({"type" : "request", "data" : { "source" : callSource, "destination" : targetId }}));
-		console.log('send success');
+	if(targetId!= ''){
+		ws.send(JSON.stringify({"type" : "request", "data" : {"source" : callSource, "destination" : targetId }}));
+		console.log('send success to : ' + targetId);
 	}
 
+}
+
+function handleRequestMessage(message) {
+	console.log('from : ' + message.data.source);
+	console.log('to : ' + message.data.destination);
+
+	var confirmflag = confirm('call from : ' + message.data.source);
+	if(confirmflag){ //if ACK
+			ws.send(JSON.stringify({"type" : "response", "data" : {"accept" : true, "source" : callSource, "destination" : message.data.source}}));
+	}
+	else{ //if NAK
+			ws.send(JSON.stringify({"type" : "response", "data" : {"false" : true, "source" : callSource, "destination" : message.data.source}}));
+	}
 }
 
 function handleResponseMessage(message) {
 
 	/* Check ACK or NAK */
 	if (message.data.accept == true) { //ACK
-		callDestination = message.data.source;
-		// ...
+		console.log("ACK call");
+		//callDestination = message.data.source;
 	}
 	else { // NAK
+		console.log("NAK call");
 
 	}
 
@@ -230,5 +248,28 @@ function handleNegotiationNeededEvent(event) {
 			}
 		}.toString());
 	});
+
+}
+
+function loadCallPage() {
+
+	document.body.innerHTML = '';
+
+	var cameraDiv = document.createElement("div");
+	cameraDiv.setAttribute("id", "camara-div");
+	document.body.appendChild(cameraDiv);
+
+	var localVideo = document.createElement("video");
+	localVideo.setAttribute("id", "local-video");
+	localVideo.setAttribute("autoplay", "");
+	localVideo.setAttribute("muted", "");
+	var remoteVideo = document.createElement("video");
+	remoteVideo.setAttribute("id", "remote-video");
+	remoteVideo.setAttribute("autoplay", "");
+
+	document.getElementById("camara-div").appendChild(localVideo);
+	document.getElementById("camara-div").appendChild(remoteVideo);
+
+
 
 }
