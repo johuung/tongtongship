@@ -84,7 +84,7 @@ function handleMessageEvent(event){
 			}
 			else {
 				test_text[i].htmlId.innerHTML = message.guests[guest_num];
-				test_text[i].cookie = message.guests.guests[guest_num];
+				test_text[i].cookie = message.guests[guest_num];
 			}
 		}
 		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
@@ -227,5 +227,28 @@ function handleNegotiationNeededEvent(event) {
 			}
 		}.toString());
 	});
+
+}
+
+function loadCallPage() {
+
+	document.body.innerHTML = '';
+
+	var cameraDiv = document.createElement("div");
+	cameraDiv.setAttribute("id", "camara-div");
+	document.body.appendChild(cameraDiv);
+
+	var localVideo = document.createElement("video");
+	localVideo.setAttribute("id", "local-video");
+	localVideo.setAttribute("autoplay", "");
+	localVideo.setAttribute("muted", "");
+	var remoteVideo = document.createElement("video");
+	remoteVideo.setAttribute("id", "remote-video");
+	remoteVideo.setAttribute("autoplay", "");
+
+	document.getElementById("camara-div").appendChild(localVideo);
+	document.getElementById("camara-div").appendChild(remoteVideo);
+
+
 
 }
