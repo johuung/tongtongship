@@ -123,15 +123,9 @@ function hangUpCall(){
 function handleRequestClick(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	console.log('fiuck');
-<<<<<<< HEAD
-	if(test_text[targetId.split('_0')[1]].cookie != ''){
-		ws.send(JSON.stringify({"type" : "request", "data" : { "destination" : test_text[targetId.split('_0')[1]].cookie}}));
-		console.log('send success');
-=======
 	if(targetId!= ''){
 		ws.send(JSON.stringify({"type" : "request", "data" : {"source" : callSource, "destination" : targetId }}));
 		console.log('send success to : ' + targetId);
->>>>>>> f3931f036611634f15a89674a46ada93604a7511
 	}
 }
 
