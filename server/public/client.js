@@ -8,16 +8,10 @@ for(var i = 0; i<9; i++){
 
 var test_text = new Array();
 for(var i=0; i<9; i++){
-<<<<<<< HEAD
 	test_text[i] = document.createElement('h3');
 	test_text[i].innerHTML = i+'hell\n';
 	guest_box.appendChild(test_text[i]);
 	test_text[i].addEventListener('click', function(event){ console.log(event.target.id); handleRequestClick(event.target.id)});
-=======
-	test_text[i] = { "cookie" : '', "htmlId" : document.getElementById("received_cookie_0"+i)};
-	test_text[i].htmlId.innerHTML = i+'hell\n';
-	test_text[i].htmlId.addEventListener('click', function(event){ requestCall(event.target.id)});
->>>>>>> c6a0dedce15e9db2744ed17894cbd2f8a7a2ec1d
 }
 
 var canvas = document.getElementById("screenshot");
@@ -121,11 +115,7 @@ function handleMessageEvent(event){
 function hangUpCall(){
 }
 
-<<<<<<< HEAD
 function handleRequestClick(targetId){
-=======
-function requestCall( targetId ){
->>>>>>> c6a0dedce15e9db2744ed17894cbd2f8a7a2ec1d
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	console.log('fiuck');
 	if(test_text[targetId.split('_0')[1]].cookie != ''){
