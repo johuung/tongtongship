@@ -73,39 +73,6 @@ function sendScreenshot() {
 }
 
 function handleMessageEvent(event){
-<<<<<<< HEAD
-    var message = JSON.parse(event.data);
-    switch(message.type){
-    case "urls":	
-	for(var i = 0; i<9; i++){
-	    //				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
-            var guest_num = "guest"+String(i+1);
-            if (message.guests[guest_num] == null) {
-                test_text[i].htmlId.innerHTML = "Guest #"+ String(i+1)+" is null";
-            }
-            else {
-                test_text[i].htmlId.innerHTML = message.guests[guest_num];
-		test_text[i].cookie = message.guests[guest_num];
-            }
-        }
-	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
-	break;
-    case "request":	
-        var confirmflag = confirm(JSON.parse(event.data).string);
-        if(confirmflag){
-            console.log('ok');
-        }
-        else{
-            console.log('cancle');
-        }
-	break;
-    case "offer":
-	handleOfferMessage(message);
-	break;
-    case "answer":
-	handleAnswerMessage(message);
-    }
-=======
 	var message = JSON.parse(event.data);
 	switch(message.type){
 		case "urls":
@@ -123,6 +90,13 @@ function handleMessageEvent(event){
 		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 		break;
 		case "request":
+			var confirmflag = confirm(JSON.parse(event.data).string);
+			if(confirmflag){
+					console.log('ok');
+			}
+			else{
+					console.log('cancle');
+			}
 		break;
 		case "response":
 		handleResponseMessage(message);
@@ -134,7 +108,7 @@ function handleMessageEvent(event){
 		handleAnswerMessage(message);
 		break;
 	}
->>>>>>> c6ba0ddd046f08acb7284175a78276f4a2556f7a
+
 }
 
 function hangUpCall(){
@@ -155,7 +129,7 @@ function handleResponseMessage(message) {
 	/* Check ACK or NAK */
 	if (message.data.accept == true) { //ACK
 		callDestination = message.data.source;
-		// ...	
+		// ...
 	}
 	else { // NAK
 
