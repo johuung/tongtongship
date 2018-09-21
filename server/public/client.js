@@ -1,10 +1,13 @@
 var ws = new WebSocket("ws://localhost:8080");
 var video = document.getElementById("local_video");
 
+/*
 var image = new Array();
 for(var i = 0; i<9; i++){
 	image[i] = document.getElementById("received_video_0"+i);
 }
+*/
+var guest_box = document.getElementById("camera-container");
 
 var test_text = new Array();
 for(var i=0; i<9; i++){
