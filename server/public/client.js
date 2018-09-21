@@ -1,19 +1,23 @@
 var ws = new WebSocket("ws://localhost:8080");
 var video = document.getElementById("local_video");
-/*
+
 var image = new Array();
 for(var i = 0; i<9; i++){
 	image[i] = document.getElementById("received_video_0"+i);
 }
-*/
-var guest_box = document.getElementById("camera-container");
 
 var test_text = new Array();
 for(var i=0; i<9; i++){
+<<<<<<< HEAD
 	test_text[i] = document.createElement('h3');
 	test_text[i].innerHTML = i+'hell\n';
 	guest_box.appendChild(test_text[i]);
 	test_text[i].addEventListener('click', function(event){ console.log(event.target.id); handleRequestClick(event.target.id)});
+=======
+	test_text[i] = { "cookie" : '', "htmlId" : document.getElementById("received_cookie_0"+i)};
+	test_text[i].htmlId.innerHTML = i+'hell\n';
+	test_text[i].htmlId.addEventListener('click', function(event){ requestCall(event.target.id)});
+>>>>>>> c6a0dedce15e9db2744ed17894cbd2f8a7a2ec1d
 }
 
 var canvas = document.getElementById("screenshot");
@@ -25,7 +29,6 @@ var callDestination = null;
 
 ws.onopen = function(event) {
 	console.log("Connected!");
-	console.log("my cookie : " + callSource)
 }
 
 ws.onmessage = handleMessageEvent;
@@ -78,33 +81,29 @@ function sendScreenshot() {
 
 function handleMessageEvent(event){
 	var message = JSON.parse(event.data);
-
 	switch(message.type){
 		case "urls":
 		for(var i = 0; i<9; i++){
 			//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
 			var guest_num = "guest"+String(i+1);
 			if (message.guests[guest_num] == null) {
-				test_text[i].innerHTML = "Guest #"+ String(i+1)+" is null";
+				test_text[i].htmlId.innerHTML = "Guest #"+ String(i+1)+" is null";
 			}
 			else {
-				test_text[i].innerHTML = "Guest #" + String(i+1)+ " is " + message.guests[guest_num];
-				test_text[i].id = message.guests[guest_num];
+				test_text[i].htmlId.innerHTML = message.guests[guest_num];
+				test_text[i].cookie = message.guests[guest_num];
 			}
 		}
 		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 		break;
 		case "request":
-		/*
-		var confirmflag = confirm(JSON.parse(event.data).string);
-		if(confirmflag){
-				console.log('ok');
-		}
-		else{
-				console.log('cancle');
-		}
-		*/
-		handleRequestMessage(message);
+			var confirmflag = confirm(JSON.parse(event.data).string);
+			if(confirmflag){
+					console.log('ok');
+			}
+			else{
+					console.log('cancle');
+			}
 		break;
 		case "response":
 		handleResponseMessage(message);
@@ -122,37 +121,28 @@ function handleMessageEvent(event){
 function hangUpCall(){
 }
 
+<<<<<<< HEAD
 function handleRequestClick(targetId){
+=======
+function requestCall( targetId ){
+>>>>>>> c6a0dedce15e9db2744ed17894cbd2f8a7a2ec1d
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
-	if(targetId!= ''){
-		ws.send(JSON.stringify({"type" : "request", "data" : {"source" : callSource, "destination" : targetId }}));
-		console.log('send success to : ' + targetId);
+	console.log('fiuck');
+	if(test_text[targetId.split('_0')[1]].cookie != ''){
+		ws.send(JSON.stringify({"type" : "request", "data" : { "destination" : test_text[targetId.split('_0')[1]].cookie}}));
+		console.log('send success');
 	}
 
-}
-
-function handleRequestMessage(message) {
-	console.log('from : ' + message.data.source);
-	console.log('to : ' + message.data.destination);
-
-	var confirmflag = confirm('call from : ' + message.data.source);
-	if(confirmflag){ //if ACK
-			ws.send(JSON.stringify({"type" : "response", "data" : {"accept" : true, "source" : callSource, "destination" : message.data.source}}));
-	}
-	else{ //if NAK
-			ws.send(JSON.stringify({"type" : "response", "data" : {"false" : true, "source" : callSource, "destination" : message.data.source}}));
-	}
 }
 
 function handleResponseMessage(message) {
 
 	/* Check ACK or NAK */
 	if (message.data.accept == true) { //ACK
-		console.log("ACK call");
-		//callDestination = message.data.source;
+		callDestination = message.data.source;
+		// ...
 	}
 	else { // NAK
-		console.log("NAK call");
 
 	}
 
@@ -269,7 +259,5 @@ function loadCallPage() {
 
 	document.getElementById("camara-div").appendChild(localVideo);
 	document.getElementById("camara-div").appendChild(remoteVideo);
-
-
 
 }
