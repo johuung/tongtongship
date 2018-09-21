@@ -244,11 +244,11 @@ function handleOfferMessage(message) {
 		peerConnection.setLocalDescription(answer);
 	}).then(() => {
 		ws.send(JSON.stringify({
-			type: "answer",
-			data: {
-				source: callSource,
-				destination: callDestination,
-				sdp: peerConnection.localDescription
+			"type": "answer",
+			"data": {
+				"source": callSource,
+				"destination": callDestination,
+				"sdp": peerConnection.localDescription
 			}
 		}));
 	});
@@ -267,10 +267,10 @@ function handleICECandidateEvent(event) {
 
 	if (event.candidate) {
 		ws.send(JSON.stringify({
-			type: "candidate",
-			data: {
-				destination: callDestination,
-				candidate: event.candidate
+			"type": "candidate",
+			"data": {
+				"destination": callDestination,
+				"candidate": event.candidate
 			}
 		}));
 	}
@@ -283,10 +283,10 @@ function handleNegotiationNeededEvent(event) {
 		peerConnection.setLocalDescription(offer);
 	}).then(() => {
 		ws.send(JSON.stringify({
-			type: "offer",
-			data: {
-				source: callSource,
-				destination: callDestination
+			"type": "offer",
+			"data": {
+				"source": callSource,
+				"destination": callDestination
 			}
 		}));
 	});
