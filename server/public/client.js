@@ -14,7 +14,8 @@ var guestArr = new Array();
 
 for(var i=0; i<9; i++){
 	guestArr[i] = document.createElement('h3');
-	guestArr[i].innerHTML = "Blank #"+(i+1)+"\n";
+	guestArr[i].id = "First_blank";
+	guestArr[i].innerHTML = guestArr[i].id+" #"+(i+1)+"\n";
 	guest_box.appendChild(guestArr[i]);
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
@@ -318,13 +319,13 @@ function handleUrlsMessage(message){
 	for(var i = 0; i<9; i++){
 		//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
 		var guest_num = "guest"+String(i+1);
-		if (message.guests[guest_num] == null) {
-			guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is null";
+		if(message.guests[guest_num] == null){
+			guestArr[i].id = "blank";
 		}
 		else {
-			guestArr[i].innerHTML = "Guest #" + String(i+1)+ " is " + message.guests[guest_num];
 			guestArr[i].id = message.guests[guest_num];
 		}
+		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
 	}
 	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 
