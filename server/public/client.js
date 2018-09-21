@@ -22,6 +22,7 @@ var callDestination = null;
 
 ws.onopen = function(event) {
 	console.log("Connected!");
+	console.log("my cookie : " + callSource)
 }
 
 ws.onmessage = handleMessageEvent;
@@ -74,6 +75,7 @@ function sendScreenshot() {
 
 function handleMessageEvent(event){
 	var message = JSON.parse(event.data);
+
 	switch(message.type){
 		case "urls":
 		for(var i = 0; i<9; i++){
@@ -90,13 +92,16 @@ function handleMessageEvent(event){
 		//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 		break;
 		case "request":
-			var confirmflag = confirm(JSON.parse(event.data).string);
-			if(confirmflag){
-					console.log('ok');
-			}
-			else{
-					console.log('cancle');
-			}
+		/*
+		var confirmflag = confirm(JSON.parse(event.data).string);
+		if(confirmflag){
+				console.log('ok');
+		}
+		else{
+				console.log('cancle');
+		}
+		*/
+		handleRequestMessage(message);
 		break;
 		case "response":
 		handleResponseMessage(message);
@@ -114,24 +119,38 @@ function handleMessageEvent(event){
 function hangUpCall(){
 }
 
-function requestCall( targetId ){
+function requestCall(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	console.log('fiuck');
 	if(test_text[targetId.split('_0')[1]].cookie != ''){
-		ws.send(JSON.stringify({"type" : "request", "data" : { "destination" : test_text[targetId.split('_0')[1]].cookie}}));
-		console.log('send success');
+		ws.send(JSON.stringify({"type" : "request", "data" : {"source" : callSource, "destination" : test_text[targetId.split('_0')[1]].cookie}}));
+		console.log('send success to : ' + test_text[targetId.split('_0')[1]].cookie);
 	}
 
+}
+
+function handleRequestMessage(message) {
+	console.log('from : ' + message.data.source);
+	console.log('to : ' + message.data.destination);
+
+	var confirmflag = confirm('call from : ' + message.data.source);
+	if(confirmflag){ //if ACK
+			ws.send(JSON.stringify({"type" : "response", "data" : {"accept" : true, "source" : callSource, "destination" : message.data.source}}));
+	}
+	else{ //if NAK
+			ws.send(JSON.stringify({"type" : "response", "data" : {"false" : true, "source" : callSource, "destination" : message.data.source}}));
+	}
 }
 
 function handleResponseMessage(message) {
 
 	/* Check ACK or NAK */
 	if (message.data.accept == true) { //ACK
-		callDestination = message.data.source;
-		// ...
+		console.log("ACK call");
+		//callDestination = message.data.source;
 	}
 	else { // NAK
+		console.log("NAK call");
 
 	}
 
