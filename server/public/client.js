@@ -1,5 +1,6 @@
 var ws = new WebSocket("ws://localhost:8080");
-var video = document.getElementById("local_video");
+var localVideo = document.getElementById("local_video");
+var remoteVideo = null;
 
 /*
 var image = new Array();
@@ -42,12 +43,12 @@ const constraints = {
 
 navigator.mediaDevices.getUserMedia(constraints)
 .then(function(localStream) {
-	video.srcObject = localStream;
+	localVideo = localStream;
+	localVideo.srcObject = localStream;
 
 	setInterval(function() {
 		sendScreenshot();
 	}, 3000);
-
 })
 .catch(handleGetUserMediaError);
 
@@ -69,7 +70,7 @@ function handleGetUserMediaError(e) {
 
 function sendScreenshot() {
 	try {
-		let screenshot = ctx.drawImage(video, 0, 0);
+		let screenshot = ctx.drawImage(localVideo, 0, 0);
 		img = canvas.toDataURL('image/jpeg', 0.1);
 		ws.send(JSON.stringify({ "type" : "screenshot", "data" : { "image" : img } }));
 	} catch (e) {
@@ -137,10 +138,24 @@ function handleRequestMessage(message) {
 
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
-			ws.send(JSON.stringify({"type" : "response", "data" : {"accept" : true, "source" : callSource, "destination" : message.data.source}}));
+			ws.send({
+				"type" : "response",
+				"data" : {
+					"accept" : true,
+					"source" : callSource,
+					"destination" : message.data.source
+				}
+			}.toString());
 	}
 	else{ //if NAK
-			ws.send(JSON.stringify({"type" : "response", "data" : {"false" : true, "source" : callSource, "destination" : message.data.source}}));
+		ws.send({
+			"type" : "response",
+			"data" : {
+				"accept" : false,
+				"source" : callSource,
+				"destination" : message.data.source
+			}
+		}.toString());
 	}
 }
 
@@ -148,11 +163,45 @@ function handleResponseMessage(message) {
 
 	/* Check ACK or NAK */
 	if (message.data.accept == true) { //ACK
+
 		console.log("ACK call");
-		//callDestination = message.data.source;
+		$.notify("Call Was Accepted!", "success");
+
+		callDestination = message.data.source;
+		loadCallPage();
+
+		/* Create peerConnection */
+		if (peerConnection != null) {
+			console.log('u have already opened RTCPeerConnection');
+		}
+		else {
+			peerConnection = new RTCPeerConnection({
+				'iceServers': [
+					{
+						'urls': 'stun:stun.l.google.com:19302'
+					},
+					{
+						'urls': 'turn:192.158.29.39:3478?transport=udp',
+						'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+						'username': '28224511:1379330808'
+					},
+					{
+						'urls': 'turn:192.158.29.39:3478?transport=tcp',
+						'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+						'username': '28224511:1379330808'
+					}
+				]
+			});
+
+			peerConnection.onicecandidate = handleICECandidateEvent;
+		}
+
+		peerConnection.addStream(localStream);
+
 	}
 	else { // NAK
 		console.log("NAK call");
+		$.notify("Call Was Rejected T.T", "error");
 
 	}
 
@@ -195,7 +244,7 @@ function handleOfferMessage(message) {
 	/* Set RemoteDescription & Create and Send Answer */
 	var description = new RTCSessionDescription(message.data.sdp);
 	peerConnection.setRemoteDescription(description).then(function() {
-		return peerConnection.addStream(video.srcObject);
+		return peerConnection.addStream(localVideo);
 	}).then(() => {
 		return peerConnection.createAnswer();
 	}).then((answer) => {
