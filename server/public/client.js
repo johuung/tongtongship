@@ -84,7 +84,7 @@ function handleMessageEvent(event){
 	switch(message.type){
 		case "urls":
 		handleUrlsMessage(message);
-			break;
+		break;
 		case "request":
 		handleRequestMessage(message);
 		break;
