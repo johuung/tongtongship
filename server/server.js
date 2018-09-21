@@ -73,9 +73,16 @@ wss.on('connection', function connection(ws, req) {
 
 function getRandomUsers(tempCookie) {
 	return new Promise(function (resolve, reject) {
-	UserImages.findAll({where: {cookie: {[Op.ne]: tempCookie}}, limit: 9, order: [[Sequelize.fn('RANDOM')]]})
-		.then(user => {
-		resolve(user);
+		UserImages.findAll({
+			where: {
+				cookie: {
+					[Op.ne]: tempCookie
+				}
+			},
+			limit: 9,
+			order: [[Sequelize.fn('RANDOM')]]
+		}).then(user => {
+			resolve(user);
 		});
 	});
 }
@@ -86,7 +93,7 @@ function addUser(tempCookie) {
 			cookie: tempCookie,
 			url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
 		};
-		
+
 		for(var i=0; i<randomUsers.length; i++) {
 			info["guest" + String(i+1)] =  randomUsers[i].get('cookie');
 		}
@@ -149,7 +156,7 @@ function getUsersHavingNullGuests() {
 function fillNullGuest(user) {
 	return new Promise(function (resolve, reject) {
 		var exceptCookies = {where: {$and: [{cookie: {$ne: user.cookie}}]}, limit: 1, order: [Sequelize.fn('RANDOM')]};
-		
+
 		for (let i = 0; i < 9; i++) {
 			tempCookie = user['guest' + i.toString()];
 			if (tempCookie != null) {
@@ -174,7 +181,7 @@ function fillNullGuest(user) {
 
 function refreshGuests() {
 	getUsersHavingNullGuests().then(users => {
-		for (let i = 0; i < users.length; i++) {   
+		for (let i = 0; i < users.length; i++) {
 			fillNullGuest(users[i]);
 		}
 	});
@@ -207,7 +214,7 @@ function recvMessage(webSocket, recvMsg){
 					webSocket.send(data);
 				});
 				break;
-			case "request": 
+			case "request":
 			case "response":
 			case "offer":
 			case "answer":
@@ -215,7 +222,7 @@ function recvMessage(webSocket, recvMsg){
 				console.log("######");
 				getWebSocket(json.data.destination).then(webSocket => {
 				    signalingMessage(recvMsg, webSocket);
-				});	
+				});
 				break;
 		}
 		resolve();
