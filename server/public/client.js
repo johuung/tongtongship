@@ -95,7 +95,6 @@ function sendScreenshot(flag) {
 
 function handleMessageEvent(event){
 	var message = JSON.parse(event.data);
-	console.log(message);
 	switch(message.type){
 		case "urls":
 		handleUrlsMessage(message);
@@ -135,9 +134,33 @@ function handleRequestClick(targetId){
 	}
 }
 
+function handleUrlsMessage(message){
+
+	console.log("get urls message", message);
+
+	for(var i = 0; i<9; i++){
+		//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
+		var guest_num = "guest"+String(i+1);
+		if(message.data.guests[guest_num] == null){
+			guestArr[i].id = "blank"+(i+1);
+			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg'
+			guestArr[i].style="width=64 height=48";
+		}
+		else {
+			guestArr[i].id = message.data.guests[guest_num];
+			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
+			guestArr[i].style="width=64 height=48";
+		}
+//		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
+
+	}
+	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
+
+}
+
 function handleRequestMessage(message) {
-	console.log('from : ' + message.data.source);
-	console.log('to : ' + message.data.destination);
+
+	console.log("get response message", message);
 
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
@@ -166,26 +189,29 @@ function handleRequestMessage(message) {
 
 function handleResponseMessage(message) {
 
+	console.log("get response message", message);
+
 	/* Check ACK or NAK */
 	if (message.data.accept == true) { //ACK
 
 		sendScreenshot(false);
 
-		console.log("ACK call");
 		$.notify("Call Was Accepted!", "success");
 
 		callDestination = message.data.source;
 		//loadCallPage();
+
 
 		/* Create peerConnection */
 		if (peerConnection != null) {
 			console.log('u have already opened RTCPeerConnection');
 		}
 		else {
+			console.log("create peerConnection");
 			peerConnection = new RTCPeerConnection({
 				'iceServers': [
 					{
-						'urls': 'stun:stun.l.google.com:19302'
+						'urls': 'stun:stun3.l.google.com:19302'
 					},
 					{
 						'urls': 'turn:192.158.29.39:3478?transport=udp',
@@ -202,14 +228,20 @@ function handleResponseMessage(message) {
 
 			peerConnection.onicecandidate = handleICECandidateEvent;
 			peerConnection.onnegotiationneeded = handleNegotiationNeededEvent;
-			peerConnection.onaddstream = handleAddStreamEvent;
-		}
+			peerConnection.ontrack = handleTrackEvent;
+			peerConnection.onsignalingStateChangeEvent = handleSignalingStateChangeEvent;
+			peerConnection.oniceconnectionstatechange = handleICEConnectionStateChangeEvent;
+		  peerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
+		  peerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
 
-		peerConnection.addStream(localVideo.srcObject);
-		console.log('finish addStream(localStream)', localVideo.srcObject);
+		}
+		localVideo.srcObject.getTracks().forEach(track => {
+			console.log("add track");
+			peerConnection.addTrack(track, localVideo.srcObject);
+		});
+
 	}
 	else { // NAK
-		console.log("NAK call");
 		$.notify("Call Was Rejected T.T", "error");
 
 	}
@@ -221,6 +253,8 @@ function handleResponseMessage(message) {
 
 function handleOfferMessage(message) {
 
+	console.log("get offer message", message);
+
 	/* Set Destination to message.data.source */
 	callDestination = message.data.source;
 
@@ -229,10 +263,11 @@ function handleOfferMessage(message) {
 		console.log('u have already opened RTCPeerConnection');
 	}
 	else {
+		console.log("create peer connection");
 		peerConnection = new RTCPeerConnection({
 			'iceServers': [
 				{
-					'urls': 'stun:stun.l.google.com:19302'
+					'urls': 'stun:stun3.l.google.com:19302'
 				},
 				{
 					'urls': 'turn:192.158.29.39:3478?transport=udp',
@@ -248,18 +283,29 @@ function handleOfferMessage(message) {
 		});
 
 		peerConnection.onicecandidate = handleICECandidateEvent;
-		peerConnection.onnegotiationneeded = handleNegotiationNeededEvent;
-		peerConnection.onaddstream = handleAddStreamEvent;
+		//peerConnection.onnegotiationneeded = handleNegotiationNeededEvent;
+		peerConnection.ontrack = handleTrackEvent;
+		peerConnection.oniceconnectionstatechange = handleICEConnectionStateChangeEvent;
+	  peerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
+	  peerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
+
 	}
 
 	/* Set RemoteDescription & Create and Send Answer */
 	var description = new RTCSessionDescription(message.data.sdp);
-	peerConnection.setRemoteDescription(description).then(function() {
-		peerConnection.addStream(localVideo.srcObject);
+	console.log("set remote description", message.data.sdp);
+	peerConnection.setRemoteDescription(description).then(() => {
+		console.log("remote description : ", peerConnection.remoteDescription);
+		localVideo.srcObject.getTracks().forEach(track => {
+			console.log("add track");
+			peerConnection.addTrack(track, localVideo.srcObject);
+		});
 	}).then(() => {
+		console.log("create answer");
 		return peerConnection.createAnswer();
 	}).then((answer) => {
-		peerConnection.setLocalDescription(answer);
+		console.log("set local description");
+		return peerConnection.setLocalDescription(answer);
 	}).then(() => {
 		ws.send(JSON.stringify({
 			"type": "answer",
@@ -275,13 +321,19 @@ function handleOfferMessage(message) {
 
 function handleAnswerMessage(message) {
 
-	var description = new RTCSessionDescription(message.data.sdp);
+	console.log("get answer message", message);
 
-	peerConnection.setRemoteDescription(description);
+	//var description = new RTCSessionDescription(message.data.sdp);
+	console.log("set romote description", message.data.sdp);
+	//peerConnection.setRemoteDescription(description);
+	peerConnection.setRemoteDescription(message.data.sdp);
+	console.log("(ans)remote description : ", peerConnection.remoteDescription);
 
 }
 
 function handleCandidateMessage(message) {
+
+	console.log("get candidate message", message);
 
 	var candidate = new RTCIceCandidate(message.data.candidate);
 
@@ -290,6 +342,8 @@ function handleCandidateMessage(message) {
 }
 
 function handleICECandidateEvent(event) {
+
+	console.log("ICECandidate event was emitted");
 
 	if (event.candidate) {
 		ws.send(JSON.stringify({
@@ -303,14 +357,21 @@ function handleICECandidateEvent(event) {
 
 }
 
-function handleAddStreamEvent(event) {
-	console.log("emitted addstream event!!!", event.stream);
-  remoteVideo.srcObject = event.stream;
+function handleTrackEvent(event) {
+
+	console.log("Track event was emitted");
+
+	if (remoteVideo.srcObject) return;
+  remoteVideo.srcObject = event.streams[0];
 }
 
 function handleNegotiationNeededEvent(event) {
 
+	console.log("NegotiationNeeded event was emitted");
+
+	console.log("create offer");
 	peerConnection.createOffer().then(offer => {
+		console.log("set local description");
 		peerConnection.setLocalDescription(offer);
 	}).then(() => {
 		ws.send(JSON.stringify({
@@ -323,6 +384,20 @@ function handleNegotiationNeededEvent(event) {
 		}));
 	});
 
+}
+
+function handleICEConnectionStateChangeEvent(event) {
+  console.log("*** ICE connection state changed to " + peerConnection.iceConnectionState);
+}
+
+function handleSignalingStateChangeEvent(event) {
+
+	console.log("SignalingStateChange event was emitted : ", peerConnection.signalingState);
+
+}
+
+function handleICEGatheringStateChangeEvent(event) {
+  console.log("*** ICE gathering state changed to: " + peerConnection.iceGatheringState);
 }
 
 function loadCallPage() {
@@ -343,27 +418,5 @@ function loadCallPage() {
 
 	document.getElementById("camara-div").appendChild(localVideo);
 	document.getElementById("camara-div").appendChild(remoteVideo);
-
-}
-
-function handleUrlsMessage(message){
-
-	for(var i = 0; i<9; i++){
-		//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
-		var guest_num = "guest"+String(i+1);
-		if(message.data.guests[guest_num] == null){
-			guestArr[i].id = "blank"+(i+1);
-			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg'
-			guestArr[i].style="width=64 height=48";
-		}
-		else {
-			guestArr[i].id = message.data.guests[guest_num];
-			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
-			guestArr[i].style="width=64 height=48";
-		}
-//		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
-
-	}
-	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 
 }
