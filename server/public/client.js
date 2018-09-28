@@ -1,6 +1,6 @@
 var ws = new WebSocket("ws://localhost:8080");
 var localVideo = document.getElementById("local_video");
-var remoteVideo = null;
+var remoteVideo = document.getElementById("remote_video");;
 
 /*
 var image = new Array();
@@ -20,8 +20,7 @@ for(var i=0; i<9; i++){
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
 
-var canvas = document.getElementById("screenshot");
-var ctx = canvas.getContext('2d');
+var ScreenshotTimer = null;
 
 var peerConnection = null;
 var callSource = document.cookie.replace(/(?:(?:^|.*;\s*)cookie\s*\=\s*([^;]*).*$)|^.*$/, "$1");;
@@ -46,10 +45,8 @@ const constraints = {
 navigator.mediaDevices.getUserMedia(constraints)
 .then(function(localStream) {
 	localVideo.srcObject = localStream;
-
-	setInterval(function() {
-		sendScreenshot();
-	}, 3000);
+	console.log('localStream is ', localStream);
+	sendScreenshot(true);
 })
 .catch(handleGetUserMediaError);
 
@@ -69,25 +66,34 @@ function handleGetUserMediaError(e) {
 	}
 }
 
-function sendScreenshot() {
-	try {
-		let screenshot = ctx.drawImage(localVideo, 0, 0);
-		img = canvas.toDataURL('image/jpeg', 0.1);
-		ws.send(JSON.stringify({
-			"type": "screenshot",
-			"data": {
-				"image": img
-			}
-		}));
+function sendScreenshot(flag) {
 
-	} catch (e) {
-		console.log('Unable to acquire screenshot: ' + e);
+	if (flag) { // Start
+		ScreenshotTimer = setInterval(() => {
+			try {
+				var can = document.createElement("canvas");
+				can.getContext('2d').drawImage(localVideo, 0, 0);
+				var img = can.toDataURL('image/jpeg', 0.1);
+				ws.send(JSON.stringify({
+					"type": "screenshot",
+					"data": {
+						"image": img
+					}
+				}));
+
+			} catch (e) {
+				console.log('Unable to acquire screenshot: ' + e);
+			}
+		}, 3000);
+	} else { // Stop
+		clearInterval(ScreenshotTimer);
 	}
+
 }
 
 function handleMessageEvent(event){
 	var message = JSON.parse(event.data);
-
+	console.log(message);
 	switch(message.type){
 		case "urls":
 		handleUrlsMessage(message);
@@ -104,6 +110,8 @@ function handleMessageEvent(event){
 		case "answer":
 		handleAnswerMessage(message);
 		break;
+		case "candidate":
+		handleCandidateMessage(message);
 	}
 
 }
@@ -131,6 +139,8 @@ function handleRequestMessage(message) {
 
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
+		sendScreenshot(false);
+
 			ws.send(JSON.stringify({
 				"type": "response",
 				"data": {
@@ -157,11 +167,13 @@ function handleResponseMessage(message) {
 	/* Check ACK or NAK */
 	if (message.data.accept == true) { //ACK
 
+		sendScreenshot(false);
+
 		console.log("ACK call");
 		$.notify("Call Was Accepted!", "success");
 
 		callDestination = message.data.source;
-		loadCallPage();
+		//loadCallPage();
 
 		/* Create peerConnection */
 		if (peerConnection != null) {
@@ -187,10 +199,12 @@ function handleResponseMessage(message) {
 			});
 
 			peerConnection.onicecandidate = handleICECandidateEvent;
+			peerConnection.onnegotiationneeded = handleNegotiationNeededEvent;
+			peerConnection.onaddstream = handleAddStreamEvent;
 		}
 
 		peerConnection.addStream(localVideo.srcObject);
-
+		console.log('finish addStream(localStream)', localVideo.srcObject);
 	}
 	else { // NAK
 		console.log("NAK call");
@@ -232,6 +246,8 @@ function handleOfferMessage(message) {
 		});
 
 		peerConnection.onicecandidate = handleICECandidateEvent;
+		peerConnection.onnegotiationneeded = handleNegotiationNeededEvent;
+		peerConnection.onaddstream = handleAddStreamEvent;
 	}
 
 	/* Set RemoteDescription & Create and Send Answer */
@@ -263,6 +279,14 @@ function handleAnswerMessage(message) {
 
 }
 
+function handleCandidateMessage(message) {
+
+	var candidate = new RTCIceCandidate(message.data.candidate);
+
+	peerConnection.addIceCandidate(candidate);
+
+}
+
 function handleICECandidateEvent(event) {
 
 	if (event.candidate) {
@@ -277,6 +301,11 @@ function handleICECandidateEvent(event) {
 
 }
 
+function handleAddStreamEvent(event) {
+	console.log("emitted addstream event!!!", event.stream);
+  remoteVideo.srcObject = event.stream;
+}
+
 function handleNegotiationNeededEvent(event) {
 
 	peerConnection.createOffer().then(offer => {
@@ -286,7 +315,8 @@ function handleNegotiationNeededEvent(event) {
 			"type": "offer",
 			"data": {
 				"source": callSource,
-				"destination": callDestination
+				"destination": callDestination,
+				"sdp": peerConnection.localDescription
 			}
 		}));
 	});
