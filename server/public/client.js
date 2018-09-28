@@ -13,9 +13,11 @@ var guest_box = document.getElementById("camera-container");
 var guestArr = new Array();
 
 for(var i=0; i<9; i++){
-	guestArr[i] = document.createElement('h3');
+	guestArr[i] = document.createElement('img');
+	guestArr[i].style="width=64 height=48";
+//	guestArr[i] = document.createElement('h3');
+//	guestArr[i].innerHTML = guestArr[i].id+"\n";
 	guestArr[i].id = "First_blank"+(i+1);
-	guestArr[i].innerHTML = guestArr[i].id+"\n";
 	guest_box.appendChild(guestArr[i]);
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
@@ -116,7 +118,7 @@ function handleMessageEvent(event){
 
 }
 
-function hangUpCall(){
+function handleRefreshClick(){
 }
 
 function handleRequestClick(targetId){
@@ -253,7 +255,7 @@ function handleOfferMessage(message) {
 	/* Set RemoteDescription & Create and Send Answer */
 	var description = new RTCSessionDescription(message.data.sdp);
 	peerConnection.setRemoteDescription(description).then(function() {
-		return peerConnection.addStream(localVideo.srcObject);
+		peerConnection.addStream(localVideo.srcObject);
 	}).then(() => {
 		return peerConnection.createAnswer();
 	}).then((answer) => {
@@ -351,11 +353,16 @@ function handleUrlsMessage(message){
 		var guest_num = "guest"+String(i+1);
 		if(message.data.guests[guest_num] == null){
 			guestArr[i].id = "blank"+(i+1);
+			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg'
+			guestArr[i].style="width=64 height=48";
 		}
 		else {
 			guestArr[i].id = message.data.guests[guest_num];
+			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
+			guestArr[i].style="width=64 height=48";
 		}
-		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
+//		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
+
 	}
 	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 
