@@ -384,7 +384,11 @@ function closeVideoCall() {
 
 		if (localVideo.srcObject) {
 			localVideo.srcObject.getTracks().forEach(track => track.stop());
+<<<<<<< HEAD
 			//localVideo.srcObject = null;
+=======
+			localVideo.srcObject = null;
+>>>>>>> c2586c0ed7247d4a5f1ca573e149f4fc68c8872d
 		}
 
 		peerConnection.close();
