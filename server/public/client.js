@@ -2,7 +2,6 @@ var ws = new WebSocket("ws://localhost:8080");
 var localVideo = document.getElementById("local_video");
 var remoteVideo = document.getElementById("remote_video");
 var refreshButton = document.getElementById("refresh_guest_member");
-refreshButton.addEventListener('click',function(event){ handleRefreshClick() });
 /*
 var image = new Array();
 for(var i = 0; i<9; i++){
@@ -43,15 +42,15 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-	video: { width: 450, height: 450 }
+	video: true
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
 .then(function(localStream) {
 	localVideo.srcObject = localStream;
 	console.log('localStream is ', localStream);
-	localVideo.width = constraints.video.width;
-	localVideo.height = constraints.video.height;
+//	localVideo.width = constraints.video.width;
+//	localVideo.height = constraints.video.height;
 	sendScreenshot(true);
 })
 .catch(handleGetUserMediaError);
@@ -376,7 +375,7 @@ function handleRemoveStreamEvent(event) {
 	closeVideoCall();
 }
 
-function hangUpCall() {
+function handleHangUpClick() {
 	closeVideoCall();
 	ws.send(JSON.stringify({
 		"type": "hangup"
@@ -392,11 +391,8 @@ function closeVideoCall() {
 
 		if (localVideo.srcObject) {
 			localVideo.srcObject.getTracks().forEach(track => track.stop());
-<<<<<<< HEAD
-			//localVideo.srcObject = null;
-=======
+
 			localVideo.srcObject = null;
->>>>>>> c2586c0ed7247d4a5f1ca573e149f4fc68c8872d
 		}
 
 		peerConnection.close();
@@ -523,8 +519,4 @@ function loadCallPage() {
 	document.getElementById("camara-div").appendChild(localVideo);
 	document.getElementById("camara-div").appendChild(remoteVideo);
 
-}
-
-function handleHangUpClick(){
-	console.log(constraints.video.width);
 }
