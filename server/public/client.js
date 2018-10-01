@@ -14,7 +14,8 @@ var guestArr = new Array();
 
 for(var i=0; i<9; i++){
 	guestArr[i] = document.createElement('img');
-	guestArr[i].style="width=64 height=48";
+	guestArr[i].width=64;
+	guestArr[i].height=48;
 //	guestArr[i] = document.createElement('h3');
 //	guestArr[i].innerHTML = guestArr[i].id+"\n";
 	guestArr[i].id = "First_blank"+(i+1);
@@ -359,7 +360,6 @@ function handleUrlsMessage(message){
 		else {
 			guestArr[i].id = message.data.guests[guest_num];
 			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
-			guestArr[i].style="width=64 height=48";
 		}
 //		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
 
