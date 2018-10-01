@@ -1,20 +1,13 @@
 var ws = new WebSocket("ws://localhost:8080");
 var localVideo = document.getElementById("local_video");
-var remoteVideo = document.getElementById("remote_video");;
-
-/*
-var image = new Array();
-for(var i = 0; i<9; i++){
-	image[i] = document.getElementById("received_video_0"+i);
-}
-*/
-var guest_box = document.getElementById("camera-container");
+var remoteVideo = document.getElementById("remote_video");
+var refreshButton = document.getElementById("refresh_guest_member");
+var guest_box = document.getElementById("remote_container");
 
 var guestArr = new Array();
 
 for(var i=0; i<9; i++){
 	guestArr[i] = document.createElement('img');
-	guestArr[i].style="width=64 height=48";
 //	guestArr[i] = document.createElement('h3');
 //	guestArr[i].innerHTML = guestArr[i].id+"\n";
 	guestArr[i].id = "First_blank"+(i+1);
@@ -41,13 +34,15 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-	video: true
+	video: {width : 450, height : 450}
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
 .then(function(localStream) {
 	localVideo.srcObject = localStream;
 	console.log('localStream is ', localStream);
+	localVideo.width = constraints.video.width;
+	localVideo.height = constraints.video.height;
 	sendScreenshot(true);
 })
 .catch(handleGetUserMediaError);
@@ -144,13 +139,13 @@ function handleUrlsMessage(message){
 		if(message.data.guests[guest_num] == null){
 			guestArr[i].id = "blank"+(i+1);
 			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg'
-			guestArr[i].style="width=64 height=48";
 		}
 		else {
 			guestArr[i].id = message.data.guests[guest_num];
 			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
-			guestArr[i].style="width=64 height=48";
 		}
+		guestArr[i].width = localVideo.width/3;
+		guestArr[i].height = localVideo.height/3;
 //		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
 
 	}
@@ -179,7 +174,7 @@ function handleRequestMessage(message) {
 			ws.send(JSON.stringify({
 				"type": "response",
 				"data": {
-					"false": true,
+					"accept": false,
 					"source": callSource,
 					"destination": message.data.source
 				}
@@ -319,6 +314,86 @@ function handleOfferMessage(message) {
 
 }
 
+//-------------------------------------------------- added
+
+function handleVideoOfferMessage(message) {
+	var localStream = null;
+
+	targetUsername = message.name;
+	createPeerConnection();
+
+	var desc = new RTCSessionDescription(message.sdp);
+
+	peerConnection.setRemoteDescription(desc).then(function () {
+		return navigator.mediaDevices.getUserMedia(mediaConstraints);
+	})
+	.then(function(stream) {
+		localStream = stream;
+
+		document.getElementById("local_video").srcObject = localStream;
+		return peerConnection.addStream(localStream);
+	})
+	.then(function() {
+		return peerConnection.createAnswer();
+	})
+	.then(function(answer) {
+		return peerConnection.setLocalDescription(answer);
+	})
+	.then(function() {
+		var message = {
+			name: myUsername,
+			target: targetUsername,
+			type: "video-answer",
+			sdp: peerConnection.localDescription
+		};
+		sw.send(message);
+	})
+	.catch(handleGetUserMediaError);
+}
+
+function handleNewICECandidateMessage(message) {
+	var candidate = new RTCIceCandidate(message.candidate);
+
+	peerConnection.addIceCandidate(candidate)
+		.catch(reportError);
+}
+
+function handleRemoveStreamEvent(event) {
+	closeVideoCall();
+}
+
+function handleHangUpClick() {
+	closeVideoCall();
+	ws.send(JSON.stringify({
+		"type": "hangup"
+	}));
+}
+
+function closeVideoCall() {
+	if (peerConnection) {
+		if (remoteVideo.srcObject) {
+			remoteVideo.srcObject.getTracks().forEach(track => track.stop());
+			remoteVideo.srcObject = null;
+		}
+
+		if (localVideo.srcObject) {
+			localVideo.srcObject.getTracks().forEach(track => track.stop());
+
+			localVideo.srcObject = null;
+		}
+
+		peerConnection.close();
+		peerConnection = null;
+	}
+
+	console.log("hang up");
+	//document.getElementById("hangup-button").disabled = true;
+
+	//targetUsername = null;
+}
+
+//------------------------------------------------------------------------------
+
 function handleAnswerMessage(message) {
 
 	console.log("get answer message", message);
@@ -388,12 +463,24 @@ function handleNegotiationNeededEvent(event) {
 
 function handleICEConnectionStateChangeEvent(event) {
   console.log("*** ICE connection state changed to " + peerConnection.iceConnectionState);
+
+	switch(peerConnection.iceConnectionState) {
+		case "closed":
+		case "failed":
+		case "disconnected":
+			closeVideoCall();
+			break;
+	}
 }
 
 function handleSignalingStateChangeEvent(event) {
-
 	console.log("SignalingStateChange event was emitted : ", peerConnection.signalingState);
 
+	switch(peerConnection.signalingState) {
+		case "closed":
+			closeVideoCall();
+			break;
+	}
 }
 
 function handleICEGatheringStateChangeEvent(event) {
