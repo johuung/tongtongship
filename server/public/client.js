@@ -320,6 +320,85 @@ function handleOfferMessage(message) {
 
 }
 
+//-------------------------------------------------- added
+
+function handleVideoOfferMessage(message) {
+	var localStream = null;
+
+	targetUsername = message.name;
+	createPeerConnection();
+
+	var desc = new RTCSessionDescription(message.sdp);
+
+	peerConnection.setRemoteDescription(desc).then(function () {
+		return navigator.mediaDevices.getUserMedia(mediaConstraints);
+	})
+	.then(function(stream) {
+		localStream = stream;
+
+		document.getElementById("local_video").srcObject = localStream;
+		return peerConnection.addStream(localStream);
+	})
+	.then(function() {
+		return peerConnection.createAnswer();
+	})
+	.then(function(answer) {
+		return peerConnection.setLocalDescription(answer);
+	})
+	.then(function() {
+		var message = {
+			name: myUsername,
+			target: targetUsername,
+			type: "video-answer",
+			sdp: peerConnection.localDescription
+		};
+		sw.send(message);
+	})
+	.catch(handleGetUserMediaError);
+}
+
+function handleNewICECandidateMessage(message) {
+	var candidate = new RTCIceCandidate(message.candidate);
+
+	peerConnection.addIceCandidate(candidate)
+		.catch(reportError);
+}
+
+function handleRemoveStreamEvent(event) {
+	closeVideoCall();
+}
+
+function hangUpCall() {
+	closeVideoCall();
+	ws.send(JSON.stringify({
+		"type": "hangup"
+	}));
+}
+
+function closeVideoCall() {
+	if (peerConnection) {
+		if (remoteVideo.srcObject) {
+			remoteVideo.srcObject.getTracks().forEach(track => track.stop());
+			remoteVideo.srcObject = null;
+		}
+
+		if (localVideo.srcObject) {
+			localVideo.srcObject.getTracks().forEach(track => track.stop());
+			localVideo.srcObject = null;
+		}
+
+		peerConnection.close();
+		peerConnection = null;
+	}
+
+	console.log("hang up");
+	//document.getElementById("hangup-button").disabled = true;
+
+	//targetUsername = null;
+}
+
+//------------------------------------------------------------------------------
+
 function handleAnswerMessage(message) {
 
 	console.log("get answer message", message);
@@ -389,12 +468,24 @@ function handleNegotiationNeededEvent(event) {
 
 function handleICEConnectionStateChangeEvent(event) {
   console.log("*** ICE connection state changed to " + peerConnection.iceConnectionState);
+
+	switch(peerConnection.iceConnectionState) {
+		case "closed":
+		case "failed":
+		case "disconnected":
+			closeVideoCall();
+			break;
+	}
 }
 
 function handleSignalingStateChangeEvent(event) {
-
 	console.log("SignalingStateChange event was emitted : ", peerConnection.signalingState);
 
+	switch(peerConnection.signalingState) {
+		case "closed":
+			closeVideoCall();
+			break;
+	}
 }
 
 function handleICEGatheringStateChangeEvent(event) {
