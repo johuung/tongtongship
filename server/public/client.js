@@ -1,14 +1,15 @@
 var ws = new WebSocket("ws://localhost:8080");
 var localVideo = document.getElementById("local_video");
-var remoteVideo = document.getElementById("remote_video");;
-
+var remoteVideo = document.getElementById("remote_video");
+var refreshButton = document.getElementById("refresh_guest_member");
+refreshButton.addEventListener('click',function(event){ handleRefreshClick() });
 /*
 var image = new Array();
 for(var i = 0; i<9; i++){
 	image[i] = document.getElementById("received_video_0"+i);
 }
 */
-var guest_box = document.getElementById("camera-container");
+var guest_box = document.getElementById("remote_container");
 
 var guestArr = new Array();
 
@@ -42,13 +43,15 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-	video: true
+	video: { width: 450, height: 450 }
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
 .then(function(localStream) {
 	localVideo.srcObject = localStream;
 	console.log('localStream is ', localStream);
+	localVideo.width = constraints.video.width;
+	localVideo.height = constraints.video.height;
 	sendScreenshot(true);
 })
 .catch(handleGetUserMediaError);
@@ -119,6 +122,9 @@ function handleMessageEvent(event){
 }
 
 function handleRefreshClick(){
+	console.log(localVideo.width);
+	console.log(localVideo.height);
+	console.log("kkk");
 }
 
 function handleRequestClick(targetId){
@@ -145,12 +151,14 @@ function handleUrlsMessage(message){
 		if(message.data.guests[guest_num] == null){
 			guestArr[i].id = "blank"+(i+1);
 			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg'
-			guestArr[i].style="width=64 height=48";
+			guestArr[i].width=64;
+			guestArr[i].height=48;
 		}
 		else {
 			guestArr[i].id = message.data.guests[guest_num];
 			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
-			guestArr[i].style="width=64 height=48";
+			guestArr[i].width=64;
+			guestArr[i].height=48;
 		}
 //		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
 
@@ -420,4 +428,8 @@ function loadCallPage() {
 	document.getElementById("camara-div").appendChild(localVideo);
 	document.getElementById("camara-div").appendChild(remoteVideo);
 
+}
+
+function handleHangUpClick(){
+	console.log(constraints.video.width);
 }
