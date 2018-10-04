@@ -132,14 +132,11 @@ function handleRequestClick(targetId){
 			}));
 		console.log('send success to : ' + targetId);
 	}
-<<<<<<< HEAD
-=======
 	else{
 		console.log('click 0');
 	}
 
 	setLoadingImage(targetId);
->>>>>>> c28306fdf1ef0465f298dcca7c71659496e7b532
 
 }
 
