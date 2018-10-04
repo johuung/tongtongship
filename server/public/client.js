@@ -365,7 +365,11 @@ function handleRemoveStreamEvent(event) {
 function handleHangUpClick() {
 	closeVideoCall();
 	ws.send(JSON.stringify({
-		"type": "hangup"
+		"type": "hangup",
+		"data": {
+			"source": callSource,
+			"destination": callDestination
+		}
 	}));
 }
 

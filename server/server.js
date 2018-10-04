@@ -117,6 +117,16 @@ function deleteUser(cookie) {
 	});
 }
 
+function deleteCallUser(cookie) {
+	CallUsers.destroy({
+		where: {
+			cookie: cookie
+		}
+	}).then((result) => {
+		console.log(result);
+	});
+}
+
 function getRandomCookie() {
 	var tempCookie;
 	var sw = true;
@@ -200,6 +210,10 @@ function handleMessageEvent(webSocket, data){
 				console.log(message.data.source);
 				signalingMessage(message, webSocket);
 			});
+			break;
+			case "hangup":
+			deleteCallUser(json.data.callSource);
+			deleteCallUser(json.data.callDestination);
 			break;
 		}
 }
