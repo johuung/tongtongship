@@ -3,6 +3,7 @@ var localVideo = document.getElementById("local_video");
 var remoteVideo = document.getElementById("remote_video");
 var refreshButton = document.getElementById("refresh_guest_member");
 var guest_box = document.getElementById("remote_container");
+var local_box = document.getElementById("local_container");
 
 var guestArr = new Array();
 
@@ -14,6 +15,10 @@ for(var i=0; i<9; i++){
 	guest_box.appendChild(guestArr[i]);
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
+
+guest_box.style.position = "absolute";
+guest_box.style.left = local_box.offsetLeft + 400;
+guest_box.style.top = local_box.offsetTop;
 
 var ScreenshotTimer = null;
 
@@ -34,7 +39,7 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-	video: {width : 450, height : 450}
+	video: {width : 320, height : 240}
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
@@ -43,6 +48,8 @@ navigator.mediaDevices.getUserMedia(constraints)
 	console.log('localStream is ', localStream);
 	localVideo.width = constraints.video.width;
 	localVideo.height = constraints.video.height;
+	remoteVideo.width = localVideo.width;
+	remoteVideo.height = localVideo.height;
 	sendScreenshot(true);
 })
 .catch(handleGetUserMediaError);
@@ -113,6 +120,7 @@ function handleMessageEvent(event){
 }
 
 function handleRefreshClick(){
+
 }
 
 function handleRequestClick(targetId){
@@ -144,8 +152,8 @@ function handleUrlsMessage(message){
 			guestArr[i].id = message.data.guests[guest_num];
 			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
 		}
-		guestArr[i].width = localVideo.width/3;
-		guestArr[i].height = localVideo.height/3;
+		guestArr[i].width = remoteVideo.width/3;
+		guestArr[i].height = remoteVideo.height/3;
 //		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
 
 	}
@@ -438,6 +446,9 @@ function handleTrackEvent(event) {
 
 	if (remoteVideo.srcObject) return;
   remoteVideo.srcObject = event.streams[0];
+
+	remoteVideo.style = "";
+
 }
 
 function handleNegotiationNeededEvent(event) {
