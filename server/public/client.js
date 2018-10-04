@@ -34,9 +34,13 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
+<<<<<<< HEAD
 	video:
 	{width : 320,
 	height : 240}
+=======
+	video: { width: 640, height: 480 }
+>>>>>>> ba70e9b4c9c99c43adbe4f3af96feb5419aa1572
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
@@ -317,48 +321,6 @@ function handleOfferMessage(message) {
 }
 
 //-------------------------------------------------- added
-
-function handleVideoOfferMessage(message) {
-	var localStream = null;
-
-	targetUsername = message.name;
-	createPeerConnection();
-
-	var desc = new RTCSessionDescription(message.sdp);
-
-	peerConnection.setRemoteDescription(desc).then(function () {
-		return navigator.mediaDevices.getUserMedia(mediaConstraints);
-	})
-	.then(function(stream) {
-		localStream = stream;
-
-		document.getElementById("local_video").srcObject = localStream;
-		return peerConnection.addStream(localStream);
-	})
-	.then(function() {
-		return peerConnection.createAnswer();
-	})
-	.then(function(answer) {
-		return peerConnection.setLocalDescription(answer);
-	})
-	.then(function() {
-		var message = {
-			name: myUsername,
-			target: targetUsername,
-			type: "video-answer",
-			sdp: peerConnection.localDescription
-		};
-		sw.send(message);
-	})
-	.catch(handleGetUserMediaError);
-}
-
-function handleNewICECandidateMessage(message) {
-	var candidate = new RTCIceCandidate(message.candidate);
-
-	peerConnection.addIceCandidate(candidate)
-		.catch(reportError);
-}
 
 function handleRemoveStreamEvent(event) {
 	closeVideoCall();
