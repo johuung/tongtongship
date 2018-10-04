@@ -3,6 +3,7 @@ var localVideo = document.getElementById("local_video");
 var remoteVideo = document.getElementById("remote_video");
 var refreshButton = document.getElementById("refresh_guest_member");
 var guest_box = document.getElementById("remote_container");
+var local_box = document.getElementById("local_container");
 
 var guestArr = new Array();
 
@@ -10,7 +11,8 @@ for(var i=0; i<9; i++){
 	guestArr[i] = document.createElement('img');
 //	guestArr[i] = document.createElement('h3');
 //	guestArr[i].innerHTML = guestArr[i].id+"\n";
-	guestArr[i].id = "First_blank"+(i+1);
+	guestArr[i].id = "blank"+i;
+	guestArr[i].style.position = "absolute";
 	guest_box.appendChild(guestArr[i]);
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
@@ -34,9 +36,7 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-	video:
-	{width : 320,
-	height : 240}
+	video: {width : 320, height : 240}
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
@@ -45,6 +45,8 @@ navigator.mediaDevices.getUserMedia(constraints)
 	console.log('localStream is ', localStream);
 	localVideo.width = constraints.video.width;
 	localVideo.height = constraints.video.height;
+	remoteVideo.width = localVideo.width;
+	remoteVideo.height = localVideo.height;
 	sendScreenshot(true);
 })
 .catch(handleGetUserMediaError);
@@ -115,11 +117,12 @@ function handleMessageEvent(event){
 }
 
 function handleRefreshClick(){
+
 }
 
 function handleRequestClick(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
-	if(targetId!= ''){
+	if(targetId.substr(NaN,5)!= 'blank'){
 		ws.send(JSON.stringify({
 			"type": "request",
 			"data": {
@@ -129,30 +132,21 @@ function handleRequestClick(targetId){
 			}));
 		console.log('send success to : ' + targetId);
 	}
+	else{
+		console.log('click 0');
+	}
+
+	setLoadingImage(targetId);
+
 }
 
 function handleUrlsMessage(message){
 
 	console.log("get urls message", message);
 
-	for(var i = 0; i<9; i++){
-		//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
-		var guest_num = "guest"+String(i+1);
-		if(message.data.guests[guest_num] == null){
-			guestArr[i].id = "blank"+(i+1);
-			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg'
-		}
-		else {
-			guestArr[i].id = message.data.guests[guest_num];
-			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
-		}
-		guestArr[i].width = localVideo.width/3;
-		guestArr[i].height = localVideo.height/3;
-//		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
-
-	}
+	setGuestArray(message);
+	setGuestImage();
 	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
-
 }
 
 function handleRequestMessage(message) {
@@ -208,17 +202,17 @@ function handleResponseMessage(message) {
 			peerConnection = new RTCPeerConnection({
 				'iceServers': [
 					{
-						'urls': 'stun:52.79.242.54:3478'
+						'urls': 'stun:stun3.l.google.com:19302'
 					},
 					{
-						'urls': 'turn:52.79.242.54:3478?transport=udp',
-						'credential': 'guesswhat',
-						'username': 'tongtongship'
+						'urls': 'turn:192.158.29.39:3478?transport=udp',
+						'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+						'username': '28224511:1379330808'
 					},
 					{
-						'urls': 'turn:52.79.242.54:3478?transport=tcp',
-						'credential': 'guesswhat',
-						'username': 'tongtongship'
+						'urls': 'turn:192.158.29.39:3478?transport=tcp',
+						'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+						'username': '28224511:1379330808'
 					}
 				]
 			});
@@ -264,17 +258,17 @@ function handleOfferMessage(message) {
 		peerConnection = new RTCPeerConnection({
 			'iceServers': [
 				{
-					'urls': 'stun:52.79.242.54:3478'
+					'urls': 'stun:stun3.l.google.com:19302'
 				},
 				{
-					'urls': 'turn:52.79.242.54:3478?transport=udp',
-					'credential': 'guesswhat',
-					'username': 'tongtongship'
+					'urls': 'turn:192.158.29.39:3478?transport=udp',
+					'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+					'username': '28224511:1379330808'
 				},
 				{
-					'urls': 'turn:52.79.242.54:3478?transport=tcp',
-					'credential': 'guesswhat',
-					'username': 'tongtongship'
+					'urls': 'turn:192.158.29.39:3478?transport=tcp',
+					'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+					'username': '28224511:1379330808'
 				}
 			]
 		});
@@ -317,6 +311,48 @@ function handleOfferMessage(message) {
 }
 
 //-------------------------------------------------- added
+
+function handleVideoOfferMessage(message) {
+	var localStream = null;
+
+	targetUsername = message.name;
+	createPeerConnection();
+
+	var desc = new RTCSessionDescription(message.sdp);
+
+	peerConnection.setRemoteDescription(desc).then(function () {
+		return navigator.mediaDevices.getUserMedia(mediaConstraints);
+	})
+	.then(function(stream) {
+		localStream = stream;
+
+		document.getElementById("local_video").srcObject = localStream;
+		return peerConnection.addStream(localStream);
+	})
+	.then(function() {
+		return peerConnection.createAnswer();
+	})
+	.then(function(answer) {
+		return peerConnection.setLocalDescription(answer);
+	})
+	.then(function() {
+		var message = {
+			name: myUsername,
+			target: targetUsername,
+			type: "video-answer",
+			sdp: peerConnection.localDescription
+		};
+		sw.send(message);
+	})
+	.catch(handleGetUserMediaError);
+}
+
+function handleNewICECandidateMessage(message) {
+	var candidate = new RTCIceCandidate(message.candidate);
+
+	peerConnection.addIceCandidate(candidate)
+		.catch(reportError);
+}
 
 function handleRemoveStreamEvent(event) {
 	closeVideoCall();
@@ -398,6 +434,9 @@ function handleTrackEvent(event) {
 
 	if (remoteVideo.srcObject) return;
   remoteVideo.srcObject = event.streams[0];
+
+	remoteVideo.style = "";
+
 }
 
 function handleNegotiationNeededEvent(event) {
@@ -466,4 +505,79 @@ function loadCallPage() {
 	document.getElementById("camara-div").appendChild(localVideo);
 	document.getElementById("camara-div").appendChild(remoteVideo);
 
+}
+
+function setGuestArray(message){
+
+	for(var i in guestArr){
+		var pastBool = 0;
+		for(var j in message.data.guests){
+			if(guestArr[i].id == message.data.guests[j].guest){
+				pastBool = 1;
+			}
+		}
+		if(pastBool == 0){
+			guestArr[i].id = "blank"+i;
+		}
+	}
+
+	for(var i in message.data.guests){
+		var newBool = 0;
+		for(var j in guestArr){
+			if(message.data.guests[i].guest == guestArr[j].id){
+				newBool = 1;
+			}
+		}
+		if(newBool == 0){
+			for(var k in guestArr){
+				if(guestArr[k].id == "blank"+k){
+					guestArr[k].id = message.data.guests[i].guest;
+					break;
+				}
+			}
+		}
+	}
+
+}
+
+function setGuestImage(){
+
+	for(var i = 0; i<9; i++){
+		if(guestArr[i].id == "blank"+i){
+			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg';
+		}
+		else{
+			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
+		}
+		guestArr[i].width = remoteVideo.width/3;
+		guestArr[i].height = remoteVideo.height/3;
+		guestArr[i].style.left = (String)(local_box.offsetLeft + 400 + guestArr[i].width*(i%3)) + 'px';
+
+		if(i>=0 && i<3){
+			guestArr[i].style.top = (String)(local_box.offsetTop) + 'px';
+		}
+		else if(i>=3 && i<6){
+			guestArr[i].style.top = (String)(local_box.offsetTop + guestArr[i].height) + 'px';
+		}
+		else{
+			guestArr[i].style.top = (String)(local_box.offsetTop + 2*guestArr[i].height) + 'px';
+		}
+	}
+
+}
+
+function setLoadingImage(targetId){
+	var targetNum = 0;
+	for(var i in guestArr){
+		if(guestArr[i].id != targetId){
+			guestArr[i].style.display = "none";
+		}
+		else {
+			targetNum = i;
+		}
+	}
+	guestArr[targetNum].style.top = (String)(local_box.offsetTop) + 'px';
+	guestArr[targetNum].style.left = (String)(local_box.offsetLeft + 400 )+ 'px';
+	guestArr[targetNum].width = remoteVideo.width;
+	guestArr[targetNum].height = remoteVideo.height;
 }
