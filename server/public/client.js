@@ -146,6 +146,10 @@ function handleUrlsMessage(message){
 
 	setGuestArray(message);
 	setGuestImage();
+		for(var i in guestArr){
+			console.log("#"+i+" "+guestArr[i].id);
+		}
+
 	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
 }
 
@@ -512,7 +516,7 @@ function setGuestArray(message){
 	for(var i in guestArr){
 		var pastBool = 0;
 		for(var j in message.data.guests){
-			if(guestArr[i].id == message.data.guests[j].guest){
+			if(guestArr[i].id == message.data.guests[j]){
 				pastBool = 1;
 			}
 		}
@@ -524,14 +528,14 @@ function setGuestArray(message){
 	for(var i in message.data.guests){
 		var newBool = 0;
 		for(var j in guestArr){
-			if(message.data.guests[i].guest == guestArr[j].id){
+			if(message.data.guests[i] == guestArr[j].id){
 				newBool = 1;
 			}
 		}
 		if(newBool == 0){
 			for(var k in guestArr){
 				if(guestArr[k].id == "blank"+k){
-					guestArr[k].id = message.data.guests[i].guest;
+					guestArr[k].id = message.data.guests[i];
 					break;
 				}
 			}
