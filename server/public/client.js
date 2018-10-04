@@ -473,11 +473,20 @@ function handleICEConnectionStateChangeEvent(event) {
   console.log("*** ICE connection state changed to " + peerConnection.iceConnectionState);
 
 	switch(peerConnection.iceConnectionState) {
+		case "completed":
+		ws.send(JSON.stringify({
+			"type": "complete",
+			"data": {
+				"source": callSource,
+				"destination": callDestination
+			}
+		}));
+		break;
 		case "closed":
 		case "failed":
 		case "disconnected":
-			closeVideoCall();
-			break;
+		closeVideoCall();
+		break;
 	}
 }
 

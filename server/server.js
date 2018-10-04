@@ -51,7 +51,7 @@ app.get('/', function (req, res) {
 	var tempCookie = getRandomCookie();
 	res.append('Set-Cookie', cookie.serialize('cookie', tempCookie));
 	res.sendFile(path.join(__dirname+'/../client/client.html'));
-	addUser(tempCookie);
+	addLobbyUser(tempCookie);
 	console.log('set cookie : ' + tempCookie);
 });
 
@@ -107,6 +107,14 @@ function addLobbyUser(tempCookie) {
 		});
 
 	});
+}
+
+function addCallUser(cookie) {
+
+	CallUsers.create({
+		cookie: cookie
+	});
+
 }
 
 function deleteLobbyUser(cookie) {
@@ -181,28 +189,29 @@ function fillNullGuest(cookie, guests) {
 }
 
 function handleMessageEvent(webSocket, data){
-		var message = JSON.parse(data);
+	var message = JSON.parse(data);
 
-		switch(message.type) {
-			case "screenshot":
-			handleScreenshotMessage(webSocket, message);
-			break;
-			case "request":
-			handleRequestMessage(message);
-			break;
-			case "response":
-			handleResponseMessage(message);
-			break;
-			case "offer":
-			case "answer":
-			case "candidate":
-			getWebSocket(message.data.destination).then(webSocket => {
-				console.log(message.data.source);
-				signalingMessage(message, webSocket);
-			});
-			break;
-			case "complete":
-		}
+	switch(message.type) {
+		case "screenshot":
+		handleScreenshotMessage(webSocket, message);
+		break;
+		case "request":
+		handleRequestMessage(message);
+		break;
+		case "response":
+		handleResponseMessage(message);
+		break;
+		case "offer":
+		case "answer":
+		case "candidate":
+		getWebSocket(message.data.destination).then(webSocket => {
+			signalingMessage(message, webSocket);
+		});
+		break;
+		case "complete":
+		handleCompleteMessage(message);
+		break;
+	}
 }
 
 function handleScreenshotMessage(webSocket, message) {
@@ -271,6 +280,18 @@ function handleResponseMessage(message) {
 	getWebSocket(message.data.destination).then(webSocket => {
 		signalingMessage(message, webSocket);
 	});
+
+}
+
+function handleCompleteMessage(message) {
+
+	/* Insert User to CallUsers table */
+	addCallUser(message.data.source);
+	addCallUser(message.data.destination);
+
+	/* Delete User From LobbyUsers table (Cascade in Matchings table) */
+	deleteLobbyUser(message.data.source);
+	deleteLobbyUser(message.data.destination);
 
 }
 
