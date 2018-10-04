@@ -11,7 +11,7 @@ for(var i=0; i<9; i++){
 	guestArr[i] = document.createElement('img');
 //	guestArr[i] = document.createElement('h3');
 //	guestArr[i].innerHTML = guestArr[i].id+"\n";
-	guestArr[i].id = "First_blank"+(i+1);
+	guestArr[i].id = "blank"+i;
 	guest_box.appendChild(guestArr[i]);
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
@@ -135,31 +135,52 @@ function handleRequestClick(targetId){
 			}));
 		console.log('send success to : ' + targetId);
 	}
-	
+
 }
 
 function handleUrlsMessage(message){
 
 	console.log("get urls message", message);
+	for(var i in guestArr){
+		var pastBool = 0;
+		for(var j in message.data.guests){
+			if(guestArr[i].id == message.data.guests[j].guest){
+				pastBool = 1;
+			}
+		}
+		if(pastBool == 0){
+			guestArr[i].id = "blank"+i;
+		}
+	}
+	for(var i in message.data.guests){
+		var newBool = 0;
+		for(var j in guestArr){
+			if(message.data.guests[i].guest == guestArr[j].id){
+				newBool = 1;
+			}
+		}
+		if(newBool == 0){
+			for(var k in guestArr){
+				if(guestArr[k].id == "blank"+k){
+					guestArr[k].id = message.data.guests[i].guest;
+					break;
+				}
+			}
+		}
+	}
 
 	for(var i = 0; i<9; i++){
-		//				image[i].src = JSON.parse(event.data).guests[i]+'?t=' + new Date().getTime();
-		var guest_num = "guest"+String(i+1);
-		if(message.data.guests[guest_num] == null){
-			guestArr[i].id = "blank"+(i+1);
-			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg'
+		console.log("###"+guestArr[i].id);
+		if(guestArr[i].id == "blank"+i){
+			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg';
 		}
-		else {
-			guestArr[i].id = message.data.guests[guest_num];
+		else{
 			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
 		}
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
-//		guestArr[i].innerHTML = "Guest #"+ String(i+1)+" is "+ guestArr[i].id;
-
 	}
 	//              image.src = 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + document.cookie + '.jpeg?t=' + new Date().getTime();
-
 }
 
 function handleRequestMessage(message) {
