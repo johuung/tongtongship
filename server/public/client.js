@@ -34,13 +34,9 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-<<<<<<< HEAD
 	video:
 	{width : 320,
 	height : 240}
-=======
-	video: { width: 640, height: 480 }
->>>>>>> ba70e9b4c9c99c43adbe4f3af96feb5419aa1572
 };
 
 navigator.mediaDevices.getUserMedia(constraints)

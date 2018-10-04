@@ -65,8 +65,8 @@ wss.on('connection', function connection(ws, req) {
 	reqCookies = cookie.parse(req.headers.cookie);
 	ws.cookie = reqCookies['cookie'];
 
-	ws.on('message', function incoming(message) {
-		recvMessage(ws, message);
+	ws.on('message', (data) => {
+		handleMessageEvent(ws, data);
 	});
 	ws.on('close', function close() {
 		console.log('disconnected');
@@ -74,10 +74,8 @@ wss.on('connection', function connection(ws, req) {
 	});
 });
 
-function getRandomUsers(tempCookie) {
+function getRandomLobbyUsers(tempCookie) {
 	return new Promise(function (resolve, reject) {
-		console.log(sequelize.random);
-		console.log(sequelize.random());
 		LobbyUsers.findAll({
 			where: {
 				cookie: {
@@ -85,8 +83,6 @@ function getRandomUsers(tempCookie) {
 				}
 			},
 			limit: 9,
-			//order: sequelize.col('cookie')
-			//order: [Sequelize.fn('RANDOM')]
 			order: sequelize.random()
 		}).then(user => {
 			resolve(user);
@@ -95,26 +91,21 @@ function getRandomUsers(tempCookie) {
 }
 
 function addUser(tempCookie) {
-	getRandomUsers(tempCookie).then(function (randomUsers) {
+	getRandomLobbyUsers(tempCookie).then((randomUsers) => {
 		var info = {
 			cookie: tempCookie,
 			url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
 		};
 
 		LobbyUsers.create(info).then((user) => {
-			for(var i=0; i<randomUsers.length; i++) {
+			for (let randomUser of randomUsers) {
 				Matchings.create({
 					host: user.get('cookie'),
-					guest: randomUsers[i].get('cookie')
+					guest: randomUser.get('cookie')
 				})
 			}
 		});
 
-
-
-
-
-		console.log('add User complete');
 	});
 }
 
@@ -123,8 +114,6 @@ function deleteUser(cookie) {
 		where: {
 			cookie: cookie
 		}
-	}).then((result) => {
-		console.log(result);
 	});
 }
 
@@ -136,7 +125,9 @@ function getRandomCookie() {
 		tempCookie = randomString({length: 10});
 
 		LobbyUsers.findOne({where: {cookie: tempCookie}}).then((user) => {
-			sw = false;
+			CallUsers.findOne({where: {cookie: tempCookie}}).then((user) => {
+				sw = false;
+			});
 		});
 	}
 	while(sw == false);
@@ -153,76 +144,132 @@ function getGuests(cookie) {
 			}
 		}).then(guests => {
 			if (guests.length < 9) {
-				fillNullGuest(cookie, guests).then(() => {
-					resolve(guests);
-				})
+				fillNullGuest(cookie, guests);
 			}
-			resolve(guests);
+			guestList = [];
+			for (guest of guests) {
+				guestList.push(guest.guest);
+			}
+			resolve(guestList);
 		});
 	});
 }
 
 function fillNullGuest(cookie, guests) {
-	return new Promise(function (resolve, reject) {
-		var exceptCookies = {
-			where: {
-				$and: [{cookie: {$ne: cookie}}]
-			},
-			limit: (9 - guests.length),
-			order: [Sequelize.fn('RANDOM')]
-		};
+	var exceptCookies = {
+		where: {
+			$and: [{cookie: {$ne: cookie}}]
+		},
+		limit: (9 - guests.length),
+		order: [Sequelize.fn('RANDOM')]
+	};
 
-		for (let guest of guests) {
-			exceptCookies.where['$and'].push({cookie: {$ne: guest.get("guest")}});
-		}
+	for (let guest of guests) {
+		exceptCookies.where['$and'].push({cookie: {$ne: guest.get("guest")}});
+	}
 
-		LobbyUsers.findAll(exceptCookies).then(newGuests => {
-			if (newGuests != 0) {
-				for (let newGuest of newGuests) {
-					Matchings.create({
-						host: cookie,
-						guest: newGuest.get("cookie")
-					});
-				}
+	LobbyUsers.findAll(exceptCookies).then(newGuests => {
+		if (newGuests != 0) {
+			for (let newGuest of newGuests) {
+				Matchings.create({
+					host: cookie,
+					guest: newGuest.get("cookie")
+				});
 			}
-		});
-		resolve();
+		}
 	});
 }
 
-function recvMessage(webSocket, recvMsg){
+function handleMessageEvent(webSocket, data){
+		var message = JSON.parse(data);
 
-	return new Promise(function (resolve, reject) {
-		var json = JSON.parse(recvMsg);
-
-		console.log(json);
-
-		switch(json.type) {
+		switch(message.type) {
 			case "screenshot":
-			getGuests(webSocket.cookie).then((guests) => {
+			handleScreenshotMessage(webSocket, message);
+			break;
+			case "request":
+			handleRequestMessage(message);
+			break;
+			case "response":
+			handleResponseMessage(message);
+			case "offer":
+			case "answer":
+			case "candidate":
+			getWebSocket(message.data.destination).then(webSocket => {
+				console.log(message.data.source);
+				signalingMessage(message, webSocket);
+			});
+			break;
+		}
+}
+
+function handleScreenshotMessage(webSocket, message) {
+	getGuests(webSocket.cookie).then((guests) => {
+		var data = JSON.stringify({
+			"type": 'urls',
+			"data": {
+				"guests": guests
+			}
+		});
+		console.log(data);
+		webSocket.send(data);
+	});
+}
+
+/* From Host to Guest */
+function handleRequestMessage(message) {
+	/* Update Host's state to "busy" */
+	updateLobbyUserState(message.data.source, "busy").then(() => {
+		/* Check Guest's state */
+		LobbyUser.findOne({
+			where: {
+				attributes: ['state'],
+				cookie: message.data.destination
+			}
+		}).then(user => {
+			/* Guest is "idle" */
+			if (user.get('state') == "idle") {
+				/* Update Guest's state to "busy" */
+				updateLobbyUserState(message.data.destination, "idle").then(() => {
+					/* Signal to Guest */
+					getWebSocket(message.data.destination).then(webSocket => {
+						signalingMessage(message, webSocket);
+					});
+				});
+			}
+			/* Guest is "busy" */
+			else {
+				/* Update Host's state to "idle" */
+				updateLobbyUserState(message.data.source, "idle");
 				var data = JSON.stringify({
-					"type": 'urls',
+					"type": "response",
 					"data": {
-						"guests": guests
+						"accept": false,
+						"reason": "Guest is busy"
 					}
 				});
 				console.log(data);
 				webSocket.send(data);
-			});
-			break;
-			case "request":
-			case "response":
-			case "offer":
-			case "answer":
-			case "candidate":
-			getWebSocket(json.data.destination).then(webSocket => {
-				console.log(json.data.source);
-				signalingMessage(recvMsg, webSocket);
-			});
-			break;
-		}
-		resolve();
+			}
+		});
 	});
+
+}
+
+/* From Guest to Host */
+function handleResponseMessage(message) {
+
+	/* Guest sent NAK */
+	if (message.data.accept == false) {
+		/* Update Host's state to "idle" */
+		updateLobbyUserState(message.data.source, "idle");
+	}
+
+	/* Signal to Guest */
+	getWebSocket(message.data.destination).then(webSocket => {
+		signalingMessage(message, webSocket);
+	});
+
 }
 
 function getWebSocket(cookie) {
@@ -236,8 +283,21 @@ function getWebSocket(cookie) {
 }
 
 function signalingMessage(message, destination) {
+	destination.send(message);
+}
+
+function updateLobbyUserState(cookie, state) {
 	return new Promise(function (resolve, reject) {
-		destination.send(message);
-		resolve();
+		findOne({
+			where: {
+				cookie: cookie
+			}
+		}).then(user => {
+			user.update({
+				state: state
+			}).then(() => {
+				resolve();
+			})
+		})
 	});
 }
