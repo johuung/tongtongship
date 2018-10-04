@@ -6,7 +6,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true
     },
     url: DataTypes.STRING,
-    status: DataTypes.ENUM('idle', 'busy')
+    state: {
+      type: DataTypes.ENUM,
+      values: ['idle', 'busy']
+    }
   }, {});
   LobbyUser.associate = function(models) {
     // associations can be defined here
