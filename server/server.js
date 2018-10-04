@@ -192,6 +192,7 @@ function handleMessageEvent(webSocket, data){
 			break;
 			case "response":
 			handleResponseMessage(message);
+			break;
 			case "offer":
 			case "answer":
 			case "candidate":
