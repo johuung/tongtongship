@@ -90,7 +90,7 @@ function getRandomLobbyUsers(tempCookie) {
 	});
 }
 
-function addUser(tempCookie) {
+function addLobbyUser(tempCookie) {
 	getRandomLobbyUsers(tempCookie).then((randomUsers) => {
 		var info = {
 			cookie: tempCookie,
@@ -109,7 +109,7 @@ function addUser(tempCookie) {
 	});
 }
 
-function deleteUser(cookie) {
+function deleteLobbyUser(cookie) {
 	LobbyUsers.destroy({
 		where: {
 			cookie: cookie
@@ -200,6 +200,7 @@ function handleMessageEvent(webSocket, data){
 				signalingMessage(message, webSocket);
 			});
 			break;
+			case "complete":
 		}
 }
 
@@ -221,16 +222,16 @@ function handleRequestMessage(message) {
 	/* Update Host's state to "busy" */
 	updateLobbyUserState(message.data.source, "busy").then(() => {
 		/* Check Guest's state */
-		LobbyUser.findOne({
+		LobbyUsers.findOne({
+			attributes: ['state'],
 			where: {
-				attributes: ['state'],
 				cookie: message.data.destination
 			}
 		}).then(user => {
 			/* Guest is "idle" */
 			if (user.get('state') == "idle") {
 				/* Update Guest's state to "busy" */
-				updateLobbyUserState(message.data.destination, "idle").then(() => {
+				updateLobbyUserState(message.data.destination, "busy").then(() => {
 					/* Signal to Guest */
 					getWebSocket(message.data.destination).then(webSocket => {
 						signalingMessage(message, webSocket);
@@ -283,12 +284,12 @@ function getWebSocket(cookie) {
 }
 
 function signalingMessage(message, destination) {
-	destination.send(message);
+	destination.send(JSON.stringify(message));
 }
 
 function updateLobbyUserState(cookie, state) {
 	return new Promise(function (resolve, reject) {
-		findOne({
+		LobbyUsers.findOne({
 			where: {
 				cookie: cookie
 			}
