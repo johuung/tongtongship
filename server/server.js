@@ -128,6 +128,16 @@ function deleteUser(cookie) {
 	});
 }
 
+function deleteCallUser(cookie) {
+	CallUsers.destroy({
+		where: {
+			cookie: cookie
+		}
+	}).then((result) => {
+		console.log(result);
+	});
+}
+
 function getRandomCookie() {
 	var tempCookie;
 	var sw = true;
@@ -219,6 +229,10 @@ function recvMessage(webSocket, recvMsg){
 				console.log(json.data.source);
 				signalingMessage(recvMsg, webSocket);
 			});
+			break;
+			case "hangup":
+			deleteCallUser(json.data.callSource);
+			deleteCallUser(json.data.callDestination);
 			break;
 		}
 		resolve();

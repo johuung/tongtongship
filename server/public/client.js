@@ -135,7 +135,7 @@ function handleRequestClick(targetId){
 			}));
 		console.log('send success to : ' + targetId);
 	}
-	
+
 }
 
 function handleUrlsMessage(message){
@@ -375,6 +375,10 @@ function handleHangUpClick() {
 	closeVideoCall();
 	ws.send(JSON.stringify({
 		"type": "hangup"
+		"data": {
+			"source": callSource,
+			"destination": callDestination
+		}
 	}));
 }
 
