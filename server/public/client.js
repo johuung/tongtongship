@@ -425,6 +425,7 @@ function handleICECandidateEvent(event) {
 			"type": "candidate",
 			"data": {
 				"destination": callDestination,
+				"source": callSource,
 				"candidate": event.candidate
 			}
 		}));
