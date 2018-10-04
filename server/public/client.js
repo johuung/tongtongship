@@ -135,6 +135,7 @@ function handleRequestClick(targetId){
 			}));
 		console.log('send success to : ' + targetId);
 	}
+	
 }
 
 function handleUrlsMessage(message){
