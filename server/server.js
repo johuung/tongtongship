@@ -70,7 +70,8 @@ wss.on('connection', function connection(ws, req) {
 	});
 	ws.on('close', function close() {
 		console.log('disconnected');
-		deleteUser(ws.cookie);
+		deleteLobbyUser(ws.cookie);
+		deleteCallUser(ws.cookie);
 	});
 });
 
@@ -113,6 +114,16 @@ function addCallUser(cookie) {
 
 	CallUsers.create({
 		cookie: cookie
+	});
+
+}
+
+function deleteCallUser(cookie) {
+
+	CallUsers.destroy({
+		where: {
+			cookie: cookie
+		}
 	});
 
 }
@@ -294,6 +305,7 @@ function handleCompleteMessage(message) {
 	deleteLobbyUser(message.data.destination);
 
 }
+
 
 function getWebSocket(cookie) {
 	return new Promise(function (resolve, reject) {

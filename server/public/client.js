@@ -391,6 +391,9 @@ function closeVideoCall() {
 	}
 
 	console.log("hang up");
+
+	location.reload(true);
+
 	//document.getElementById("hangup-button").disabled = true;
 
 	//targetUsername = null;
