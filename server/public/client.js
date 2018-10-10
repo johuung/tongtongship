@@ -9,8 +9,6 @@ var guestArr = new Array();
 
 for(var i=0; i<9; i++){
 	guestArr[i] = document.createElement('img');
-//	guestArr[i] = document.createElement('h3');
-//	guestArr[i].innerHTML = guestArr[i].id+"\n";
 	guestArr[i].id = "blank"+i;
 	guestArr[i].style.position = "absolute";
 	guest_box.appendChild(guestArr[i]);
@@ -123,6 +121,7 @@ function handleRefreshClick(){
 function handleRequestClick(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	if(targetId.substr(NaN,5)!= 'blank'){
+		sendScreenshot(false);
 		ws.send(JSON.stringify({
 			"type": "request",
 			"data": {
@@ -237,6 +236,7 @@ function handleResponseMessage(message) {
 
 	}
 	else { // NAK
+		sendScreenshot(true);
 		$.notify("Call Was Rejected T.T", "error");
 
 	}
@@ -444,7 +444,7 @@ function handleTrackEvent(event) {
 	if (remoteVideo.srcObject) return;
   remoteVideo.srcObject = event.streams[0];
 
-	remoteVideo.style = "";
+	setRemoteVideo();
 
 }
 
@@ -552,6 +552,7 @@ function setGuestArray(message){
 function setGuestImage(){
 
 	for(var i = 0; i<9; i++){
+		guestArr[i].style.display = "";
 		if(guestArr[i].id == "blank"+i){
 			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg';
 		}
@@ -576,6 +577,7 @@ function setGuestImage(){
 }
 
 function setLoadingImage(targetId){
+
 	var targetNum = 0;
 	for(var i in guestArr){
 		if(guestArr[i].id != targetId){
@@ -589,4 +591,26 @@ function setLoadingImage(targetId){
 	guestArr[targetNum].style.left = (String)(local_box.offsetLeft + 400 )+ 'px';
 	guestArr[targetNum].width = remoteVideo.width;
 	guestArr[targetNum].height = remoteVideo.height;
+
+	console.log(guestArr[targetNum].style);
+
+}
+
+function offGuestImage(){
+
+	for(var i in guestArr){
+		guestArr[i].style.display = "none";
+	}
+
+}
+
+function setRemoteVideo(){
+
+	offGuestImage();
+	remoteVideo.style.display = "";
+  remoteVideo.style.position = "absolute";
+	remoteVideo.style.top = (String)(local_box.offsetTop) + 'px';
+	remoteVideo.style.left = (String)(local_box.offsetLeft + 400 ) + 'px';
+
+	console.log(remoteVideo.style);
 }
