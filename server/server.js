@@ -1,13 +1,29 @@
-var express = require('express');
-var app = express();
-var path = require("path");
-var randomString = require('random-string');
-var cookie = require('cookie');
+const express = require('express');
+const app = express();
+const path = require("path");
+const randomString = require('random-string');
+const cookie = require('cookie');
+const fs = require('fs');
 
-var models = require('../db/models');
-var LobbyUsers = models.LobbyUser;
-var CallUsers = models.CallUser;
-var Matchings = models.Matching;
+const WebSocket = require('ws');
+const http = require('http');
+// Certificate
+
+/*
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/tongtongship.tk/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/tongtongship.tk/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/tongtongship.tk/fullchain.pem', 'utf8');
+const credentials = {
+	key: privateKey,
+	cert: certificate,
+	ca: ca
+};
+*/
+
+const models = require('../db/models');
+const LobbyUsers = models.LobbyUser;
+const CallUsers = models.CallUser;
+const Matchings = models.Matching;
 
 const env = 'development';
 const config = require('../db/config/config.js')[env];
@@ -55,11 +71,16 @@ app.get('/', function (req, res) {
 	console.log('set cookie : ' + tempCookie);
 });
 
-const WebSocket = require('ws');
-const http = require('http');
-//const wss = new WebSocket.Server({ port: 8080 });
-const server = new http.createServer(app).listen(8080);
-const wss = new WebSocket.Server({ server: server, clientTracking: true });
+app.get('/userImages/:cookie', function(req, res) {
+	var cookie = req.params.cookie;
+
+	res.sendFile(path.join(__dirname+'/../../userImages/'+cookie+'.jpeg'));
+});
+
+const httpServer = new http.createServer(app).listen(80);
+//const httpsServer = new https.createServer(credentials, app).listen(443);
+const wss = new WebSocket.Server({ server: httpServer, clientTracking: true });
+//const wss = new WebSocket.Server({ server: httpsServer, clientTracking: true });
 
 wss.on('connection', function connection(ws, req) {
 	reqCookies = cookie.parse(req.headers.cookie);
@@ -226,6 +247,11 @@ function handleMessageEvent(webSocket, data){
 }
 
 function handleScreenshotMessage(webSocket, message) {
+	var image = message.data.image;
+	var data = image.replace(/^data:image\/\w+;base64,/, "");
+	var buf = new Buffer(data, 'base64');
+	fs.writeFileSync(path.join(__dirname+'/../../userImages/'+webSocket.cookie+'.jpeg'), buf);
+
 	getGuests(webSocket.cookie).then((guests) => {
 		var data = JSON.stringify({
 			"type": 'urls',
