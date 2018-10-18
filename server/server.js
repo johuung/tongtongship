@@ -96,12 +96,12 @@ wss.on('connection', function connection(ws, req) {
 	});
 });
 
-function getRandomLobbyUsers(tempCookie) {
+function getRandomLobbyUsers(cookie) {
 	return new Promise(function (resolve, reject) {
 		LobbyUsers.findAll({
 			where: {
 				cookie: {
-					[Op.ne]: tempCookie
+					[Op.ne]: cookie
 				}
 			},
 			limit: 9,
@@ -112,11 +112,11 @@ function getRandomLobbyUsers(tempCookie) {
 	});
 }
 
-function addLobbyUser(tempCookie) {
-	getRandomLobbyUsers(tempCookie).then((randomUsers) => {
+function addLobbyUser(cookie) {
+	getRandomLobbyUsers(cookie).then((randomUsers) => {
 		var info = {
-			cookie: tempCookie,
-			url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + tempCookie + '.jpeg'
+			cookie: cookie,
+			url: 'https://s3.ap-northeast-2.amazonaws.com/jehyunlims-bucket93/' + cookie + '.jpeg'
 		};
 
 		LobbyUsers.create(info).then((user) => {
@@ -240,9 +240,11 @@ function handleMessageEvent(webSocket, data){
 			signalingMessage(message, webSocket);
 		});
 		break;
-		case "complete":
-		handleCompleteMessage(message);
+		case "complete_caller":
+		handleCompleteCallerMessage(message);
 		break;
+		case "complete_callee":
+		handleCompleteCalleeMessage(message);
 	}
 }
 
@@ -252,15 +254,23 @@ function handleScreenshotMessage(webSocket, message) {
 	var buf = new Buffer(data, 'base64');
 	fs.writeFileSync(path.join(__dirname+'/../../userImages/'+webSocket.cookie+'.jpeg'), buf);
 
-	getGuests(webSocket.cookie).then((guests) => {
-		var data = JSON.stringify({
-			"type": 'urls',
-			"data": {
-				"guests": guests
-			}
-		});
-		console.log(data);
-		webSocket.send(data);
+	LobbyUsers.findOne({
+		where: {
+			cookie: websocket.cookie
+		}
+	}).then((user) => {
+		if (user.get("state") == "idle") {
+			getGuests(webSocket.cookie).then((guests) => {
+				var data = JSON.stringify({
+					"type": 'urls',
+					"data": {
+						"guests": guests
+					}
+				});
+				console.log(data);
+				webSocket.send(data);
+			});
+		}
 	});
 }
 
@@ -320,15 +330,28 @@ function handleResponseMessage(message) {
 
 }
 
-function handleCompleteMessage(message) {
+function handleCompleteCallerMessage(message) {
 
 	/* Insert User to CallUsers table */
 	addCallUser(message.data.source);
-	addCallUser(message.data.destination);
 
 	/* Delete User From LobbyUsers table (Cascade in Matchings table) */
 	deleteLobbyUser(message.data.source);
-	deleteLobbyUser(message.data.destination);
+
+	/* Signal to Callee */
+	getWebSocket(message.data.destination).then(webSocket => {
+		signalingMessage(message, webSocket);
+	});
+
+}
+
+function handleCompleteCalleeMessage(message) {
+
+	/* Insert User to CallUsers table */
+	addCallUser(message.data.source);
+
+	/* Delete User From LobbyUsers table (Cascade in Matchings table) */
+	deleteLobbyUser(message.data.source);
 
 }
 
