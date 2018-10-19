@@ -83,7 +83,7 @@ body {
 #wrap {
   position: relative;
   width: 100%;
-  height: 1000px;
+  height: 700px;
 }
 
 #contents {
@@ -95,6 +95,10 @@ body {
   width: 700px;
   height: 600px;
   margin: auto;
+}
+
+#header {
+  display: block;
 }
 
 #header > .title {
@@ -113,15 +117,15 @@ body {
 }
 
 #videos {
+  display: block;
+  position: relative;
   width: 100%;
   background-color: red;
 }
 
-#videos > button {
-  display: block;
-}
-
 #videos > .local_video_box {
+  display: inline;
+  position: relative;
   left: 0px;
   top: 0px;
   margin: 0;
@@ -130,7 +134,9 @@ body {
 }
 
 #videos > .remote_video_box {
-  left: 380px;
+  display: inline;
+  background-color: white;
+  right: 0px;
   top: 0px;
   margin: 0;
   padding: 0;
