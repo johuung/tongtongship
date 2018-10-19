@@ -2,17 +2,21 @@ var ws = new WebSocket("ws://localhost");
 var localVideo = document.getElementById("local_video");
 var remoteVideo = document.getElementById("remote_video");
 var refreshButton = document.getElementById("refresh_guest_member");
-var guest_box = document.getElementById("remote_container");
+var guest_box = document.getElementById("guest_image_array");
 var local_box = document.getElementById("local_container");
 var ACKButton = document.getElementById("ACK_btn");
 var NAKButton = document.getElementById("NAK_btn");
+var on_guest_box = documnet.getElementById("on_guest_img_container");
+
+var onGuestImg = document.createElement('img');
+on_guest_box.appendChild(onGuestImg);
 
 var guestArr = new Array();
 
 for(var i=0; i<9; i++){
 	guestArr[i] = document.createElement('img');
 	guestArr[i].id = "blank"+i;
-	guestArr[i].style.position = "absolute";
+//	guestArr[i].style.position = "absolute";
 	guest_box.appendChild(guestArr[i]);
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
@@ -559,7 +563,7 @@ function setGuestArray(message){
 }
 
 function setGuestImage(){
-
+	onGuestImg.style.display = "none";
 	for(var i = 0; i<9; i++){
 		guestArr[i].style.display = "";
 		if(guestArr[i].id == "blank"+i){
@@ -571,6 +575,7 @@ function setGuestImage(){
 		}
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
+		/*
 		guestArr[i].style.left = (String)(guest_box.offsetLeft + 400 + guestArr[i].width*(i%3)) + 'px';
 
 		if(i>=0 && i<3){
@@ -582,6 +587,7 @@ function setGuestImage(){
 		else{
 			guestArr[i].style.top = (String)(guest_box.offsetTop + 2*guestArr[i].height) + 'px';
 		}
+		*/
 	}
 
 }
@@ -591,17 +597,24 @@ function setLoadingImage(targetId){
 	var targetNum = 0;
 	for(var i in guestArr){
 		if(guestArr[i].id != targetId){
-			guestArr[i].style.display = "none";
+//			guestArr[i].style.display = "none";
 		}
 		else {
 			targetNum = i;
 		}
 	}
+	offGuestImage();
+	/*
 	guestArr[targetNum].style.top = (String)(guest_box.offsetTop) + 'px';
 	guestArr[targetNum].style.left = (String)(guest_box.offsetLeft + 400 )+ 'px';
+	*/
+	/*
 	guestArr[targetNum].width = remoteVideo.width;
 	guestArr[targetNum].height = remoteVideo.height;
-
+	*/
+	onGuestImg.width = remoteVideo.width;
+	onGuestImg.height = remoteVideo.height;
+	onGuestImg.style.display = "";
 }
 
 function offGuestImage(){
@@ -615,12 +628,13 @@ function offGuestImage(){
 function setRemoteVideo(){
 
 	offGuestImage();
+	onGuestImg.style = "none";
 	remoteVideo.style.display = "";
+	/*
   remoteVideo.style.position = "absolute";
 	remoteVideo.style.top = (String)(guest_box.offsetTop) + 'px';
 	remoteVideo.style.left = (String)(guest_box.offsetLeft + 400 ) + 'px';
-
-	console.log(remoteVideo.style);
+*/
 }
 
 function handleACKBtn(message){
