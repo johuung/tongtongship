@@ -565,7 +565,7 @@ function setGuestImage(){
 		}
 		else{
 			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
-			guestArr[i].src = 'http://localhost/userImages/'+guestArr[i].id;
+			guestArr[i].src = 'http://localhost/userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
 		}
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
@@ -635,8 +635,8 @@ function handleACKBtn(message){
 		ACKButton.style.display="none";
 		NAKButton.style.display="none";
 
-		ACKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
-		NAKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+		ACKButton.removeEventListener('click', function(event){ handleACKBtn(message) });
+		NAKButton.removeEventListener('click', function(event){ handleNAKBtn(message) });
 }
 
 function handleNAKBtn(message){
@@ -653,8 +653,8 @@ console.log(message);
 	ACKButton.style.display="none";
 	NAKButton.style.display="none";
 
-	ACKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
-	NAKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+	ACKButton.removeEventListener('click', function(event){ handleACKBtn(message) });
+	NAKButton.removeEventListener('click', function(event){ handleNAKBtn(message) });
 }
 
 function handleCompleteMessage(message){
@@ -662,7 +662,9 @@ function handleCompleteMessage(message){
 	sendScreenshot(false);
 	ws.send(JSON.stringify({
 		"type": "complete_callee",
-		"data": {}
+		"data": {
+			"source": callSource
+		}
 	}));
 
 }
