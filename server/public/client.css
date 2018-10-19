@@ -75,22 +75,37 @@
 body {
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: 100%;
   background: #ffffff url("images/background.jpeg") no-repeat center center;
   background-size: auto;
   font-family: 'notokr-regular';
 }
 
-wrap {
+#wrap {
   position: relative;
+  width: 100%;
+  height: 700px;
+}
+
+#contents {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 700px;
+  height: 600px;
+  margin: auto;
+}
+
+#header {
+  display: block;
 }
 
 #header > .title {
   width: 100%;
   height: 100px;
   font-family: 'notokr-thin';
-  font-size: 50px;
+  font-size: 40px;
   color: #ffffff;
   line-height: 100px;
   text-align: center;
@@ -101,15 +116,63 @@ wrap {
   font-family: 'notokr-bold';
 }
 
-button {
-  height: 30px;
-  font-family: 'notokr-regular';
-  font-size: 15px;
-  line-height: 30px;
+#videos {
+  display: block;
+  position: relative;
+  width: 100%;
 }
 
+#videos > .local_video_box {
+  display: inline;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  margin: 0;
+  padding: 0;
+  width: 320px;
+  line-height: 0px;
+}
+
+#videos > .remote_video_box {
+  display: inline;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  margin: 0;
+  padding: 0;
+  width: 320px;
+  line-height: 0px;
+}
+
+#videos > .remote_video_box .guests_images,
+#videos > .remote_video_box .one_guest_video,
+#videos > .remote_video_box .guest_image {
+  width: 320px;
+}
+
+#videos > .remote_video_box .buttons {
+  display: block;
+}
+
+button {
+  box-sizing: border-box;
+  height: 32px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-family: 'notokr-regular';
+  font-size: 15px;
+  line-height: 22px;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+}
+
+/*
 video {
   filter: hue-rotate(180deg) saturate(200%);
   -moz-filter: hue-rotate(180deg) saturate(200%);
   -webkit-filter: hue-rotate(180deg) saturate(200%);
 }
+*/

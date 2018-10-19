@@ -9,36 +9,46 @@
 
   <body>
     <div id="wrap">
-      <section id="header">
-        <div class="title">Meet <span>new friend</span> around the world.</div>
-      </section>
+      <div id="contents">
+        <section id="header">
+          <div class="title">Hi! <span>Tong Tong</span> Chat</div>
+        </section>
 
-      <section id="row">
-        <div class="video_box" id="local_container">
-          <video id="local_video" autoplay muted></video>
-          <button id="hangup_button" onclick="handleHangUpClick();">
-            Hang Up
-          </button>
-        </div>
-        
-        <div class="video_box" id="remote_container">
-          <video id="remote_video" autoplay style="display:none;"></video>
-          <button id="refresh_guest_member" onclick="handleRefreshClick();">
-            Refresh Guests Member
-          </button>
-          <button id="ACK_btn" style="display:none;">
-            ACK
-          </button>
-          <button id="NAK_btn" style="display:none;">
-            NAK
-          </button>
-        </div>
-        <!-- <canvas id="screenshot" style="display:none;" width=640 height=480></canvas> -->
-      </section>
+        <section id="videos">
+          <div class="local_video_box" id="local_container">
+            <video id="local_video" autoplay muted></video>
+            <div class="buttons">
+              <button id="refresh_guest_member" onclick="handleRefreshClick();">
+                Refresh Guests Member
+              </button>
+              <button id="hangup_button" onclick="handleHangUpClick();">
+                Hang Up
+              </button>
+            </div>
+          </div>
 
-      <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-      <script src="http://localhost/static/notify.min.js"></script>
-      <script src="http://localhost/static/client.js"></script>
+          <div class="remote_video_box" id="remote_container">
+            <div class="guests_images" id="guest_image_array"></div>
+            <div class="one_guest_video">
+              <video id="remote_video" autoplay style="display:none;"></video>
+            </div>
+            <div class="guest_image" id="on_guest_img_container"></div>
+            <div class="buttons">
+              <button id="ACK_btn" style="display:none;">
+                ACK
+              </button>
+              <button id="NAK_btn" style="display:none;">
+                NAK
+              </button>
+            <div>
+          </div>
+          <!-- <canvas id="screenshot" style="display:none;" width=640 height=480></canvas> -->
+        </section>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="http://localhost/static/notify.min.js"></script>
+        <script src="http://localhost/static/client.js"></script>
+      </div>
     </div>
   </body>
 </html>
