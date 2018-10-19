@@ -1,35 +1,44 @@
 <!DOCTYPE html>
+
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Native WebSocket Example</title>
-</head>
-<body>
-  <div class="row">
-    <div class="video_box" id="local_container">
-      <video id="local_video" autoplay muted></video>
-      <button id="hangup_button" onclick="handleHangUpClick();">
-        Hang Up
-      </button>
-    </div>
+  <head>
+    <meta charset="UTF-8">
+    <title>Native WebSocket Example</title>
+    <link href="http://localhost/static/client.css" rel="stylesheet" type="text/css" />
+  </head>
 
-    <div class="video_box" id="remote_container">
-      <video id="remote_video" autoplay style="display:none;"></video>
-      <button id="refresh_guest_member" onclick="handleRefreshClick();">
-        Refresh Guests Member
-      </button>
-      <button id="ACK_btn" style="display:none;">
-        ACK
-      </button>
-      <button id="NAK_btn" style="display:none;">
-        NAK
-      </button>
-    </div>
+  <body>
+    <div id="wrap">
+      <section id="header">
+        <div class="title">Meet <span>new friend</span> around the world.</div>
+      </section>
 
-    <!-- <canvas id="screenshot" style="display:none;" width=640 height=480></canvas> -->
-  </div>
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="http://localhost/static/notify.min.js"></script>
-  <script src="http://localhost/static/client.js"></script>
-</body>
+      <section id="row">
+        <div class="video_box" id="local_container">
+          <video id="local_video" autoplay muted></video>
+          <button id="hangup_button" onclick="handleHangUpClick();">
+            Hang Up
+          </button>
+        </div>
+
+        <div class="video_box" id="remote_container">
+          <video id="remote_video" autoplay style="display:none;"></video>
+          <button id="refresh_guest_member" onclick="handleRefreshClick();">
+            Refresh Guests Member
+          </button>
+          <button id="ACK_btn" style="display:none;">
+            ACK
+          </button>
+          <button id="NAK_btn" style="display:none;">
+            NAK
+          </button>
+        </div>
+        <!-- <canvas id="screenshot" style="display:none;" width=640 height=480></canvas> -->
+      </section>
+
+      <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+      <script src="http://localhost/static/notify.min.js"></script>
+      <script src="http://localhost/static/client.js"></script>
+    </div>
+  </body>
 </html>
