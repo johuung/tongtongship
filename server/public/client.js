@@ -113,7 +113,7 @@ function handleMessageEvent(event){
 		case "candidate":
 		handleCandidateMessage(message);
 		break;
-		case "complete":
+		case "complete_caller":
 		handleCompleteMessage(message);
 	}
 
