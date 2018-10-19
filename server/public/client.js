@@ -73,6 +73,8 @@ function sendScreenshot(flag) {
 		ScreenshotTimer = setInterval(() => {
 			try {
 				var can = document.createElement("canvas");
+				can.width = 320;
+				can.height = 240;
 				can.getContext('2d').drawImage(localVideo, 0, 0);
 				var img = can.toDataURL('image/jpeg', 0.1);
 				ws.send(JSON.stringify({
@@ -569,16 +571,16 @@ function setGuestImage(){
 		}
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
-		guestArr[i].style.left = (String)(local_box.offsetLeft + 400 + guestArr[i].width*(i%3)) + 'px';
+		guestArr[i].style.left = (String)(guest_box.offsetLeft + 400 + guestArr[i].width*(i%3)) + 'px';
 
 		if(i>=0 && i<3){
-			guestArr[i].style.top = (String)(local_box.offsetTop) + 'px';
+			guestArr[i].style.top = (String)(guest_box.offsetTop) + 'px';
 		}
 		else if(i>=3 && i<6){
-			guestArr[i].style.top = (String)(local_box.offsetTop + guestArr[i].height) + 'px';
+			guestArr[i].style.top = (String)(guest_box.offsetTop + guestArr[i].height) + 'px';
 		}
 		else{
-			guestArr[i].style.top = (String)(local_box.offsetTop + 2*guestArr[i].height) + 'px';
+			guestArr[i].style.top = (String)(guest_box.offsetTop + 2*guestArr[i].height) + 'px';
 		}
 	}
 
@@ -595,8 +597,8 @@ function setLoadingImage(targetId){
 			targetNum = i;
 		}
 	}
-	guestArr[targetNum].style.top = (String)(local_box.offsetTop) + 'px';
-	guestArr[targetNum].style.left = (String)(local_box.offsetLeft + 400 )+ 'px';
+	guestArr[targetNum].style.top = (String)(guest_box.offsetTop) + 'px';
+	guestArr[targetNum].style.left = (String)(guest_box.offsetLeft + 400 )+ 'px';
 	guestArr[targetNum].width = remoteVideo.width;
 	guestArr[targetNum].height = remoteVideo.height;
 
@@ -615,8 +617,8 @@ function setRemoteVideo(){
 	offGuestImage();
 	remoteVideo.style.display = "";
   remoteVideo.style.position = "absolute";
-	remoteVideo.style.top = (String)(local_box.offsetTop) + 'px';
-	remoteVideo.style.left = (String)(local_box.offsetLeft + 400 ) + 'px';
+	remoteVideo.style.top = (String)(guest_box.offsetTop) + 'px';
+	remoteVideo.style.left = (String)(guest_box.offsetLeft + 400 ) + 'px';
 
 	console.log(remoteVideo.style);
 }
