@@ -4,6 +4,8 @@ var remoteVideo = document.getElementById("remote_video");
 var refreshButton = document.getElementById("refresh_guest_member");
 var guest_box = document.getElementById("remote_container");
 var local_box = document.getElementById("local_container");
+var ACKButton = document.getElementById("ACK_btn");
+var NAKButton = document.getElementById("NAK_btn");
 
 var guestArr = new Array();
 
@@ -110,6 +112,9 @@ function handleMessageEvent(event){
 		break;
 		case "candidate":
 		handleCandidateMessage(message);
+		break;
+		case "complete":
+		handleCompleteMessage(message);
 	}
 
 }
@@ -121,7 +126,7 @@ function handleRefreshClick(){
 function handleRequestClick(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	if(targetId.substr(NaN,5)!= 'blank'){
-		sendScreenshot(false);
+//		sendScreenshot(false);
 		ws.send(JSON.stringify({
 			"type": "request",
 			"data": {
@@ -156,6 +161,13 @@ function handleRequestMessage(message) {
 
 	console.log("get response message", message);
 
+	setLoadingImage(message.data.source);
+	ACKButton.style.display="";
+	NAKButton.style.display="";
+
+	ACKButton.addEventListener('click', function(message){ handleACKBtn(message) });
+	NAKButton.addEventListener('click', function(message){ handleNAKBtn(message) });
+/*
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
 		sendScreenshot(false);
@@ -179,6 +191,8 @@ function handleRequestMessage(message) {
 				}
 			}));
 	}
+	*/
+
 }
 
 function handleResponseMessage(message) {
@@ -188,7 +202,7 @@ function handleResponseMessage(message) {
 	/* Check ACK or NAK */
 	if (message.data.accept == true) { //ACK
 
-		sendScreenshot(false);
+//		sendScreenshot(false);
 
 		$.notify("Call Was Accepted!", "success");
 
@@ -236,7 +250,7 @@ function handleResponseMessage(message) {
 
 	}
 	else { // NAK
-		sendScreenshot(true);
+//		sendScreenshot(true);
 		$.notify("Call Was Rejected T.T", "error");
 
 	}
@@ -478,11 +492,12 @@ function handleICEConnectionStateChangeEvent(event) {
 	switch(peerConnection.iceConnectionState) {
 		case "completed":
 		ws.send(JSON.stringify({
-			"type": "complete",
+			"type": "complete_caller",
 			"data": {
 				"source": callSource,
 				"destination": callDestination
 			}
+			sendScreenshot(false);
 		}));
 		break;
 		case "closed":
@@ -625,4 +640,50 @@ function setRemoteVideo(){
 	remoteVideo.style.left = (String)(local_box.offsetLeft + 400 ) + 'px';
 
 	console.log(remoteVideo.style);
+}
+
+function handleACKBtn(message){
+
+		ws.send(JSON.stringify({
+			"type": "response",
+			"data": {
+				"accept": true,
+				"source": callSource,
+				"destination": message.data.source
+			}
+		}));
+
+		ACKButton.style.display="none";
+		NAKButton.style.display="none";
+
+		ACKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+		NAKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+}
+
+function handleNAKBtn(message){
+
+	ws.send(JSON.stringify({
+		"type": "response",
+		"data": {
+			"accept": false,
+			"source": callSource,
+			"destination": message.data.source
+		}
+	}));
+
+	ACKButton.style.display="none";
+	NAKButton.style.display="none";
+
+	ACKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+	NAKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+}
+
+function handleCompleteMessage(message){
+
+	sendScreenshot(false);
+	ws.send(JSON.stringify({
+		"type": "complete_callee",
+		"data": {}
+	}));
+
 }
