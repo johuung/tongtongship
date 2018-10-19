@@ -321,6 +321,7 @@ function handleResponseMessage(message) {
 	if (message.data.accept == false) {
 		/* Update Host's state to "idle" */
 		updateLobbyUserState(message.data.source, "idle");
+		updateLobbyUserState(message.data.destination, "idle");
 	}
 
 	/* Signal to Guest */
