@@ -82,8 +82,8 @@ body {
 
 #wrap {
   position: relative;
-  width: 100%;
-  height: 700px;
+  width: 100vw;
+  height: 100vh;
 }
 
 #contents {
@@ -93,7 +93,7 @@ body {
   bottom: 0;
   right: 0;
   width: 700px;
-  height: 600px;
+  height: 400px;
   margin: auto;
 }
 
@@ -107,7 +107,6 @@ body {
   font-family: 'notokr-thin';
   font-size: 40px;
   color: #ffffff;
-  line-height: 100px;
   text-align: center;
   text-shadow: 0px 0px 8px #000000;
 }
@@ -144,14 +143,19 @@ body {
   line-height: 0px;
 }
 
+#videos > .local_video_box .one_local_video,
 #videos > .remote_video_box .guests_images,
 #videos > .remote_video_box .one_guest_video,
 #videos > .remote_video_box .guest_image {
   width: 320px;
 }
 
+#videos > .local_video_box .buttons,
 #videos > .remote_video_box .buttons {
   display: block;
+  width: 320px;
+  margin-top: 15px;
+  text-align: center;
 }
 
 button {
@@ -161,12 +165,38 @@ button {
   border: none;
   border-radius: 20px;
   padding: 5px 10px;
-  font-family: 'notokr-regular';
+  font-family: 'notokr-light';
   font-size: 15px;
   line-height: 22px;
   color: white;
   text-align: center;
   text-decoration: none;
+}
+
+@media screen and (max-width:750px) {
+
+  #contents {
+    width: 100%;
+    height: 670px;
+  }
+
+  #header > .title {
+    font-size: 30px;
+    height: 70px;
+  }
+
+  #videos > .local_video_box {
+    display: block;
+    position: relative;
+    margin: 0 auto;
+  }
+
+  #videos > .remote_video_box {
+    display: block;
+    position: relative;
+    margin: 20px auto 0 auto;
+  }
+
 }
 
 /*
