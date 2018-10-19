@@ -256,7 +256,7 @@ function handleScreenshotMessage(webSocket, message) {
 
 	LobbyUsers.findOne({
 		where: {
-			cookie: websocket.cookie
+			cookie: webSocket.cookie
 		}
 	}).then((user) => {
 		if (user.get("state") == "idle") {

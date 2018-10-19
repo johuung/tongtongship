@@ -165,8 +165,8 @@ function handleRequestMessage(message) {
 	ACKButton.style.display="";
 	NAKButton.style.display="";
 
-	ACKButton.addEventListener('click', function(message){ handleACKBtn(message) });
-	NAKButton.addEventListener('click', function(message){ handleNAKBtn(message) });
+	ACKButton.addEventListener('click', function(event){ handleACKBtn(message) });
+	NAKButton.addEventListener('click', function(event){ handleNAKBtn(message) });
 /*
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
@@ -600,8 +600,6 @@ function setLoadingImage(targetId){
 	guestArr[targetNum].width = remoteVideo.width;
 	guestArr[targetNum].height = remoteVideo.height;
 
-	console.log(guestArr[targetNum].style);
-
 }
 
 function offGuestImage(){
@@ -642,7 +640,7 @@ function handleACKBtn(message){
 }
 
 function handleNAKBtn(message){
-
+console.log(message);
 	ws.send(JSON.stringify({
 		"type": "response",
 		"data": {
