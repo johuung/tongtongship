@@ -1,4 +1,4 @@
-var ws = new WebSocket("ws://localhost:8080");
+var ws = new WebSocket("ws://localhost");
 var localVideo = document.getElementById("local_video");
 var remoteVideo = document.getElementById("remote_video");
 var refreshButton = document.getElementById("refresh_guest_member");
@@ -36,7 +36,7 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-	video: {width : 320, height : 240}
+	video: {width : 320, height : 240, frameRate: 1}
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
@@ -522,26 +522,6 @@ function handleICEGatheringStateChangeEvent(event) {
   console.log("*** ICE gathering state changed to: " + peerConnection.iceGatheringState);
 }
 
-function loadCallPage() {
-
-	document.body.innerHTML = '';
-
-	var cameraDiv = document.createElement("div");
-	cameraDiv.setAttribute("id", "camara-div");
-	document.body.appendChild(cameraDiv);
-
-	var localVideo = document.createElement("video");
-	localVideo.setAttribute("id", "local-video");
-	localVideo.setAttribute("autoplay", "");
-	localVideo.setAttribute("muted", "");
-	var remoteVideo = document.createElement("video");
-	remoteVideo.setAttribute("id", "remote-video");
-	remoteVideo.setAttribute("autoplay", "");
-
-	document.getElementById("camara-div").appendChild(localVideo);
-	document.getElementById("camara-div").appendChild(remoteVideo);
-
-}
 
 function setGuestArray(message){
 
@@ -584,7 +564,8 @@ function setGuestImage(){
 			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg';
 		}
 		else{
-			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
+			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
+			guestArr[i].src = 'http://localhost/userImages/'+guestArr[i].id;
 		}
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
