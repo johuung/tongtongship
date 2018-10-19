@@ -36,7 +36,7 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-	video: {width : 320, height : 240, frameRate: 1}
+	video: {width : 320, height : 240, frameRate: 30}
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
@@ -497,8 +497,8 @@ function handleICEConnectionStateChangeEvent(event) {
 				"source": callSource,
 				"destination": callDestination
 			}
-			sendScreenshot(false);
 		}));
+		sendScreenshot(false);
 		break;
 		case "closed":
 		case "failed":
