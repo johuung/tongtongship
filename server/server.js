@@ -256,7 +256,7 @@ function handleScreenshotMessage(webSocket, message) {
 
 	LobbyUsers.findOne({
 		where: {
-			cookie: websocket.cookie
+			cookie: webSocket.cookie
 		}
 	}).then((user) => {
 		if (user.get("state") == "idle") {
@@ -321,6 +321,7 @@ function handleResponseMessage(message) {
 	if (message.data.accept == false) {
 		/* Update Host's state to "idle" */
 		updateLobbyUserState(message.data.source, "idle");
+		updateLobbyUserState(message.data.destination, "idle");
 	}
 
 	/* Signal to Guest */

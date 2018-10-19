@@ -36,7 +36,7 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-	video: {width : 320, height : 240, frameRate: 1}
+	video: {width : 320, height : 240, frameRate: 30}
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
@@ -113,7 +113,7 @@ function handleMessageEvent(event){
 		case "candidate":
 		handleCandidateMessage(message);
 		break;
-		case "complete":
+		case "complete_caller":
 		handleCompleteMessage(message);
 	}
 
@@ -165,8 +165,8 @@ function handleRequestMessage(message) {
 	ACKButton.style.display="";
 	NAKButton.style.display="";
 
-	ACKButton.addEventListener('click', function(message){ handleACKBtn(message) });
-	NAKButton.addEventListener('click', function(message){ handleNAKBtn(message) });
+	ACKButton.addEventListener('click', function(event){ handleACKBtn(message) });
+	NAKButton.addEventListener('click', function(event){ handleNAKBtn(message) });
 /*
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
@@ -497,8 +497,8 @@ function handleICEConnectionStateChangeEvent(event) {
 				"source": callSource,
 				"destination": callDestination
 			}
-			sendScreenshot(false);
 		}));
+		sendScreenshot(false);
 		break;
 		case "closed":
 		case "failed":
@@ -565,7 +565,7 @@ function setGuestImage(){
 		}
 		else{
 			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
-			guestArr[i].src = 'http://localhost/userImages/'+guestArr[i].id;
+			guestArr[i].src = 'http://localhost/userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
 		}
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
@@ -599,8 +599,6 @@ function setLoadingImage(targetId){
 	guestArr[targetNum].style.left = (String)(local_box.offsetLeft + 400 )+ 'px';
 	guestArr[targetNum].width = remoteVideo.width;
 	guestArr[targetNum].height = remoteVideo.height;
-
-	console.log(guestArr[targetNum].style);
 
 }
 
@@ -637,12 +635,12 @@ function handleACKBtn(message){
 		ACKButton.style.display="none";
 		NAKButton.style.display="none";
 
-		ACKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
-		NAKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+		ACKButton.removeEventListener('click', function(event){ handleACKBtn(message) });
+		NAKButton.removeEventListener('click', function(event){ handleNAKBtn(message) });
 }
 
 function handleNAKBtn(message){
-
+console.log(message);
 	ws.send(JSON.stringify({
 		"type": "response",
 		"data": {
@@ -655,8 +653,8 @@ function handleNAKBtn(message){
 	ACKButton.style.display="none";
 	NAKButton.style.display="none";
 
-	ACKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
-	NAKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+	ACKButton.removeEventListener('click', function(event){ handleACKBtn(message) });
+	NAKButton.removeEventListener('click', function(event){ handleNAKBtn(message) });
 }
 
 function handleCompleteMessage(message){
@@ -664,7 +662,9 @@ function handleCompleteMessage(message){
 	sendScreenshot(false);
 	ws.send(JSON.stringify({
 		"type": "complete_callee",
-		"data": {}
+		"data": {
+			"source": callSource
+		}
 	}));
 
 }
