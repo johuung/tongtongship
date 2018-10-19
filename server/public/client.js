@@ -6,7 +6,7 @@ var guest_box = document.getElementById("guest_image_array");
 var local_box = document.getElementById("local_container");
 var ACKButton = document.getElementById("ACK_btn");
 var NAKButton = document.getElementById("NAK_btn");
-var on_guest_box = documnet.getElementById("on_guest_img_container");
+var on_guest_box = document.getElementById("on_guest_img_container");
 
 var onGuestImg = document.createElement('img');
 on_guest_box.appendChild(onGuestImg);
@@ -603,6 +603,7 @@ function setLoadingImage(targetId){
 			targetNum = i;
 		}
 	}
+	onGuestImg.src = guestArr[targetNum].src;
 	offGuestImage();
 	/*
 	guestArr[targetNum].style.top = (String)(guest_box.offsetTop) + 'px';
@@ -628,7 +629,7 @@ function offGuestImage(){
 function setRemoteVideo(){
 
 	offGuestImage();
-	onGuestImg.style = "none";
+	onGuestImg.style.display = "none";
 	remoteVideo.style.display = "";
 	/*
   remoteVideo.style.position = "absolute";

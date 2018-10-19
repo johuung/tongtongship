@@ -120,7 +120,6 @@ body {
   display: block;
   position: relative;
   width: 100%;
-  background-color: red;
 }
 
 #videos > .local_video_box {
@@ -131,16 +130,28 @@ body {
   margin: 0;
   padding: 0;
   width: 320px;
+  line-height: 0px;
 }
 
 #videos > .remote_video_box {
   display: inline;
-  background-color: white;
+  position: absolute;
   right: 0px;
   top: 0px;
   margin: 0;
   padding: 0;
   width: 320px;
+  line-height: 0px;
+}
+
+#videos > .remote_video_box .guests_images,
+#videos > .remote_video_box .one_guest_video,
+#videos > .remote_video_box .guest_image {
+  width: 320px;
+}
+
+#videos > .remote_video_box .buttons {
+  display: block;
 }
 
 button {
