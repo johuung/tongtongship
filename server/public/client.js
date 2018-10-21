@@ -171,8 +171,7 @@ function handleRequestMessage(message) {
 	ACKButton.style.display="";
 	NAKButton.style.display="";
 
-	ACKButton.addEventListener('click', function(event){ handleACKBtn(message) });
-	NAKButton.addEventListener('click', function(event){ handleNAKBtn(message) });
+	callDestination = message.data.source;
 /*
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
@@ -638,40 +637,42 @@ function setRemoteVideo(){
 */
 }
 
-function handleACKBtn(message){
-
+function handleACKBtn(){
+console.log("send ACK");
 		ws.send(JSON.stringify({
 			"type": "response",
 			"data": {
 				"accept": true,
 				"source": callSource,
-				"destination": message.data.source
+				"destination": callDestination
 			}
 		}));
 
 		ACKButton.style.display="none";
 		NAKButton.style.display="none";
-
-		ACKButton.removeEventListener('click', function(event){ handleACKBtn(message) });
-		NAKButton.removeEventListener('click', function(event){ handleNAKBtn(message) });
+/*
+		ACKButton.removeEventListener('click', handleACKBtn(message), true);
+		NAKButton.removeEventListener('click', handleNAKBtn(message), true);
+*/
 }
 
-function handleNAKBtn(message){
-console.log(message);
+function handleNAKBtn(){
+console.log("send NAK");
 	ws.send(JSON.stringify({
 		"type": "response",
 		"data": {
 			"accept": false,
 			"source": callSource,
-			"destination": message.data.source
+			"destination": callDestination
 		}
 	}));
 
 	ACKButton.style.display="none";
 	NAKButton.style.display="none";
-
-	ACKButton.removeEventListener('click', function(event){ handleACKBtn(message) });
-	NAKButton.removeEventListener('click', function(event){ handleNAKBtn(message) });
+/*
+	ACKButton.removeEventListener('click', handleACKBtn(message), true);
+	NAKButton.removeEventListener('click', handleNAKBtn(message), true);
+*/
 }
 
 function handleCompleteMessage(message){
