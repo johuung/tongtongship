@@ -150,8 +150,10 @@ body {
   width: 640px;
 }
 
-#videos > .remote_video_box .guests_images,
-#videos > .remote_video_box .guest_image {
+#videos > .remote_video_box .guests_images img,
+#videos > .remote_video_box .guest_image img {
+  width: 33%;
+  height: auto;
   -moz-transform: scale(-1, 1);
   -webkit-transform: scale(-1, 1); -o-transform: scale(-1, 1);
   transform: scale(-1, 1);
@@ -213,6 +215,34 @@ video {
     display: block;
     position: relative;
     margin: 20px auto 0 auto;
+  }
+
+}
+
+@media screen and (max-width:640px) {
+
+  #videos > .local_video_box,
+  #videos > .remote_video_box {
+    width: 100%;
+    height: auto;
+  }
+
+  #videos > .local_video_box .one_local_video,
+  #videos > .remote_video_box .guests_images,
+  #videos > .remote_video_box .one_guest_video,
+  #videos > .remote_video_box .guest_image {
+    width: 100%;
+    height: auto;
+  }
+
+  #videos > .local_video_box .buttons,
+  #videos > .remote_video_box .buttons {
+    width: 100%;
+  }
+
+  video {
+    width: 100%;
+    height: auto;
   }
 
 }

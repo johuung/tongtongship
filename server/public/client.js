@@ -7,7 +7,7 @@ var local_box = document.getElementById("local_container");
 var ACKButton = document.getElementById("ACK_btn");
 var NAKButton = document.getElementById("NAK_btn");
 var on_guest_box = document.getElementById("on_guest_img_container");
-var hangupButton = documnet.getElementById("hangup_button");
+var hangupButton = document.getElementById("hangup_button");
 
 var onGuestImg = document.createElement('img');
 on_guest_box.appendChild(onGuestImg);
@@ -568,14 +568,16 @@ function setGuestImage(){
 	for(var i = 0; i<9; i++){
 		guestArr[i].style.display = "";
 		if(guestArr[i].id == "blank"+i){
-			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg';
+			guestArr[i].src = '/static/images/waiting.jpg';
 		}
 		else{
 			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
 			guestArr[i].src = 'http://localhost/userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
 		}
+		/*
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
+		*/
 		/*
 		guestArr[i].style.left = (String)(guest_box.offsetLeft + 400 + guestArr[i].width*(i%3)) + 'px';
 
