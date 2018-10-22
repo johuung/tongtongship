@@ -7,6 +7,7 @@ const fs = require('fs');
 
 const WebSocket = require('ws');
 const http = require('http');
+const https = require('https');
 // Certificate
 
 /*
@@ -64,6 +65,11 @@ Bucket: myBucket}
 app.use('/static', express.static(path.join(__dirname, 'public')))
 
 app.get('/', function (req, res) {
+	/*
+	if (req.protocol==='http') {
+        return res.redirect('https://' + req.headers.host + req.url);
+    }
+	*/
 	var tempCookie = getRandomCookie();
 	res.append('Set-Cookie', cookie.serialize('cookie', tempCookie));
 	res.sendFile(path.join(__dirname+'/../client/client.html'));
