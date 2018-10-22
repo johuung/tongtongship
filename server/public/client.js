@@ -229,14 +229,9 @@ function handleResponseMessage(message) {
 						'urls': 'stun:stun3.l.google.com:19302'
 					},
 					{
-						'urls': 'turn:192.158.29.39:3478?transport=udp',
-						'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-						'username': '28224511:1379330808'
-					},
-					{
-						'urls': 'turn:192.158.29.39:3478?transport=tcp',
-						'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-						'username': '28224511:1379330808'
+						'urls': 'turn:numb.viagenie.ca',
+						'credential': 'muazkh',
+						'username': 'webrtc@live.com'
 					}
 				]
 			});
@@ -286,14 +281,9 @@ function handleOfferMessage(message) {
 					'urls': 'stun:stun3.l.google.com:19302'
 				},
 				{
-					'urls': 'turn:192.158.29.39:3478?transport=udp',
-					'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-					'username': '28224511:1379330808'
-				},
-				{
-					'urls': 'turn:192.158.29.39:3478?transport=tcp',
-					'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-					'username': '28224511:1379330808'
+					'urls': 'turn:numb.viagenie.ca',
+					'credential': 'muazkh',
+					'username': 'webrtc@live.com'
 				}
 			]
 		});
@@ -569,14 +559,16 @@ function setGuestImage(){
 	for(var i = 0; i<9; i++){
 		guestArr[i].style.display = "";
 		if(guestArr[i].id == "blank"+i){
-			guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number0.jpg';
+			guestArr[i].src = '/static/images/waiting.jpg';
 		}
 		else{
 			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
 			guestArr[i].src = 'userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
 		}
+		/*
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
+		*/
 		/*
 		guestArr[i].style.left = (String)(guest_box.offsetLeft + 400 + guestArr[i].width*(i%3)) + 'px';
 

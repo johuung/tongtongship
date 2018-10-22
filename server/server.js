@@ -306,8 +306,9 @@ function handleRequestMessage(message) {
 						"reason": "Guest is busy"
 					}
 				});
-				console.log(data);
-				webSocket.send(data);
+				getWebSocket(message.data.source).then(webSocket => {
+					webSocket.send(data);
+				});
 			}
 		});
 	});
