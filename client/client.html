@@ -7,14 +7,14 @@
 <body>
   <div class="row">
     <div class="video_box" id="local_container">
-      <video id="local_video" autoplay muted></video>
+      <video id="local_video" autoplay playsinline muted></video>
       <button id="hangup_button" onclick="handleHangUpClick();">
         Hang Up
       </button>
     </div>
 
     <div class="video_box" id="remote_container">
-      <video id="remote_video" autoplay style="display:none;"></video>
+      <video id="remote_video" autoplay playsinline style="display:none;"></video>
       <button id="refresh_guest_member" onclick="handleRefreshClick();">
         Refresh Guests Member
       </button>
