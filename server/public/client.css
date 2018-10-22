@@ -188,11 +188,14 @@ video {
   filter: FlipH;
 }
 
-@media screen and (max-width:750px) {
+@media screen and (max-width:1300px) {
+
+  body {
+    background-attachment: fixed;
+  }
 
   #contents {
     width: 100%;
-    height: 670px;
   }
 
   #header > .title {

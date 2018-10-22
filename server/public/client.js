@@ -77,8 +77,8 @@ function sendScreenshot(flag) {
 		ScreenshotTimer = setInterval(() => {
 			try {
 				var can = document.createElement("canvas");
-				can.width = 320;
-				can.height = 240;
+				can.width = 640;
+				can.height = 480;
 				can.getContext('2d').drawImage(localVideo, 0, 0);
 				var img = can.toDataURL('image/jpeg', 0.1);
 				ws.send(JSON.stringify({
