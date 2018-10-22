@@ -7,7 +7,7 @@ var local_box = document.getElementById("local_container");
 var ACKButton = document.getElementById("ACK_btn");
 var NAKButton = document.getElementById("NAK_btn");
 var on_guest_box = document.getElementById("on_guest_img_container");
-var hangupButton = documnet.getElementById("hangup_button");
+var hangupButton = document.getElementById("hangup_button");
 
 var onGuestImg = document.createElement('img');
 on_guest_box.appendChild(onGuestImg);
@@ -23,6 +23,7 @@ for(var i=0; i<9; i++){
 }
 
 var ScreenshotTimer = null;
+var LoadingTimer = null;
 
 var peerConnection = null;
 var callSource = document.cookie.replace(/(?:(?:^|.*;\s*)cookie\s*\=\s*([^;]*).*$)|^.*$/, "$1");;
@@ -572,7 +573,7 @@ function setGuestImage(){
 		}
 		else{
 			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
-			guestArr[i].src = 'http://localhost/userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
+			guestArr[i].src = 'userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
 		}
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
@@ -593,8 +594,24 @@ function setGuestImage(){
 
 }
 
-function setLoadingImage(targetId){
+function refreshLoadingImage(flag, source){
 
+	if (flag) { // Start
+		LoadingTimer = setInterval(() => {
+			try {
+				onGuestImg.src = source;
+			} catch (e) {
+				console.log('Unable to Load Img: ' + e);
+			}
+		}, 3000);
+	} else { // Stop
+		clearInterval(LoadingTimer);
+	}
+
+}
+
+function setLoadingImage(targetId){
+/*
 	var targetNum = 0;
 	for(var i in guestArr){
 		if(guestArr[i].id != targetId){
@@ -604,7 +621,10 @@ function setLoadingImage(targetId){
 			targetNum = i;
 		}
 	}
-	onGuestImg.src = guestArr[targetNum].src;
+	*/
+//	onGuestImg.src = guestArr[targetNum].src;
+	var imgSrc = 'userImages/'+targetId+'?t=' + new Date().getTime();
+	refreshLoadingImage(true, imgSrc);
 	offGuestImage();
 	/*
 	guestArr[targetNum].style.top = (String)(guest_box.offsetTop) + 'px';
@@ -652,6 +672,7 @@ console.log("send ACK");
 
 		ACKButton.style.display="none";
 		NAKButton.style.display="none";
+		refreshLoadingImage(false, callDestination);
 /*
 		ACKButton.removeEventListener('click', handleACKBtn(message), true);
 		NAKButton.removeEventListener('click', handleNAKBtn(message), true);
@@ -671,6 +692,7 @@ console.log("send NAK");
 
 	ACKButton.style.display="none";
 	NAKButton.style.display="none";
+	refreshLoadingImage(false, callDestination);
 /*
 	ACKButton.removeEventListener('click', handleACKBtn(message), true);
 	NAKButton.removeEventListener('click', handleNAKBtn(message), true);
