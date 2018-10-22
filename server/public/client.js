@@ -7,6 +7,7 @@ var local_box = document.getElementById("local_container");
 var ACKButton = document.getElementById("ACK_btn");
 var NAKButton = document.getElementById("NAK_btn");
 var on_guest_box = document.getElementById("on_guest_img_container");
+var hangupButton = documnet.getElementById("hangup_button");
 
 var onGuestImg = document.createElement('img');
 on_guest_box.appendChild(onGuestImg);
@@ -77,8 +78,8 @@ function sendScreenshot(flag) {
 		ScreenshotTimer = setInterval(() => {
 			try {
 				var can = document.createElement("canvas");
-				can.width = 320;
-				can.height = 240;
+				can.width = 640;
+				can.height = 480;
 				can.getContext('2d').drawImage(localVideo, 0, 0);
 				var img = can.toDataURL('image/jpeg', 0.1);
 				ws.send(JSON.stringify({
@@ -504,6 +505,7 @@ function handleICEConnectionStateChangeEvent(event) {
 			}
 		}));
 		sendScreenshot(false);
+		hangupButton.style.display = "";
 		break;
 		case "closed":
 		case "failed":
@@ -676,7 +678,7 @@ console.log("send NAK");
 }
 
 function handleCompleteMessage(message){
-
+	hangupButton.style.display = "";
 	sendScreenshot(false);
 	ws.send(JSON.stringify({
 		"type": "complete_callee",
