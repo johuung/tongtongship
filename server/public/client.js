@@ -40,7 +40,7 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
-	video: {width : 320, height : 240, frameRate: 30}
+	video: {width : 640, height : 480, frameRate: 30}
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
