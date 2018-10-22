@@ -150,9 +150,17 @@ body {
   width: 640px;
 }
 
-#videos > .remote_video_box .guests_images img,
-#videos > .remote_video_box .guest_image img {
+#videos > .remote_video_box .guests_images img {
   width: 33%;
+  height: auto;
+  -moz-transform: scale(-1, 1);
+  -webkit-transform: scale(-1, 1); -o-transform: scale(-1, 1);
+  transform: scale(-1, 1);
+  filter: FlipH;
+}
+
+#videos > .remote_video_box .guest_image img {
+  width: 100%;
   height: auto;
   -moz-transform: scale(-1, 1);
   -webkit-transform: scale(-1, 1); -o-transform: scale(-1, 1);
