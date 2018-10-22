@@ -42,6 +42,7 @@ ws.onerror = function(event) {
 }
 
 const constraints = {
+	audio: true,
 	video: {width : 640, height : 480, frameRate: 30}
 };
 
@@ -135,6 +136,7 @@ function handleRequestClick(targetId){
 	//        ws.send(JSON.stringify({"type" : 'request', "data" : { "destination" : targetCookie} }));
 	if(targetId.substr(NaN,5)!= 'blank'){
 //		sendScreenshot(false);
+		setLoadingImage(targetId);
 		ws.send(JSON.stringify({
 			"type": "request",
 			"data": {
@@ -147,8 +149,6 @@ function handleRequestClick(targetId){
 	else{
 		console.log('click 0');
 	}
-
-	setLoadingImage(targetId);
 
 }
 
@@ -172,6 +172,7 @@ function handleRequestMessage(message) {
 	setLoadingImage(message.data.source);
 	ACKButton.style.display="";
 	NAKButton.style.display="";
+	refreshButton.style.display = "none";
 
 	callDestination = message.data.source;
 /*
@@ -488,6 +489,8 @@ function handleICEConnectionStateChangeEvent(event) {
 
 	switch(peerConnection.iceConnectionState) {
 		case "completed":
+		sendScreenshot(false);
+		hangupButton.style.display = "";
 		ws.send(JSON.stringify({
 			"type": "complete_caller",
 			"data": {
@@ -495,8 +498,6 @@ function handleICEConnectionStateChangeEvent(event) {
 				"destination": callDestination
 			}
 		}));
-		sendScreenshot(false);
-		hangupButton.style.display = "";
 		break;
 		case "closed":
 		case "failed":
@@ -564,6 +565,7 @@ function setGuestImage(){
 		else{
 			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
 			guestArr[i].src = 'userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
+			if(guestArr[i].src )
 		}
 		/*
 		guestArr[i].width = remoteVideo.width/3;
@@ -591,7 +593,7 @@ function refreshLoadingImage(flag, source){
 	if (flag) { // Start
 		LoadingTimer = setInterval(() => {
 			try {
-				onGuestImg.src = source;
+				onGuestImg.src = 'userImages/'+source+'?t=' + new Date().getTime();
 			} catch (e) {
 				console.log('Unable to Load Img: ' + e);
 			}
@@ -615,8 +617,7 @@ function setLoadingImage(targetId){
 	}
 	*/
 //	onGuestImg.src = guestArr[targetNum].src;
-	var imgSrc = 'userImages/'+targetId+'?t=' + new Date().getTime();
-	refreshLoadingImage(true, imgSrc);
+	refreshLoadingImage(true, targetId);
 	offGuestImage();
 	/*
 	guestArr[targetNum].style.top = (String)(guest_box.offsetTop) + 'px';
@@ -684,6 +685,7 @@ console.log("send NAK");
 
 	ACKButton.style.display="none";
 	NAKButton.style.display="none";
+	refreshButton.style.display = "";
 	refreshLoadingImage(false, callDestination);
 /*
 	ACKButton.removeEventListener('click', handleACKBtn(message), true);
