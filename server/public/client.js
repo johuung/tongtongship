@@ -12,6 +12,7 @@ var hangupButton = document.getElementById("hangup_button");
 var onGuestImg = document.createElement('img');
 on_guest_box.appendChild(onGuestImg);
 
+
 var guestArr = new Array();
 
 for(var i=0; i<9; i++){
@@ -554,6 +555,11 @@ function setGuestArray(message){
 	}
 
 }
+function imgError(image){
+	image.onerror = "";
+	image.src = '/static/images/failed.png';
+	return true;
+}
 
 function setGuestImage(){
 	onGuestImg.style.display = "none";
@@ -565,6 +571,7 @@ function setGuestImage(){
 		else{
 			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
 			guestArr[i].src = 'userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
+			guestArr[i].onerror=imgError(guestArr[i]);
 		}
 		/*
 		guestArr[i].width = remoteVideo.width/3;
