@@ -565,7 +565,6 @@ function setGuestImage(){
 		else{
 			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
 			guestArr[i].src = 'userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
-			if(guestArr[i].src )
 		}
 		/*
 		guestArr[i].width = remoteVideo.width/3;
