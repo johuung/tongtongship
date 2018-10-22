@@ -2,17 +2,21 @@ var ws = new WebSocket("ws://localhost");
 var localVideo = document.getElementById("local_video");
 var remoteVideo = document.getElementById("remote_video");
 var refreshButton = document.getElementById("refresh_guest_member");
-var guest_box = document.getElementById("remote_container");
+var guest_box = document.getElementById("guest_image_array");
 var local_box = document.getElementById("local_container");
 var ACKButton = document.getElementById("ACK_btn");
 var NAKButton = document.getElementById("NAK_btn");
+var on_guest_box = document.getElementById("on_guest_img_container");
+
+var onGuestImg = document.createElement('img');
+on_guest_box.appendChild(onGuestImg);
 
 var guestArr = new Array();
 
 for(var i=0; i<9; i++){
 	guestArr[i] = document.createElement('img');
 	guestArr[i].id = "blank"+i;
-	guestArr[i].style.position = "absolute";
+//	guestArr[i].style.position = "absolute";
 	guest_box.appendChild(guestArr[i]);
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
 }
@@ -73,6 +77,8 @@ function sendScreenshot(flag) {
 		ScreenshotTimer = setInterval(() => {
 			try {
 				var can = document.createElement("canvas");
+				can.width = 320;
+				can.height = 240;
 				can.getContext('2d').drawImage(localVideo, 0, 0);
 				var img = can.toDataURL('image/jpeg', 0.1);
 				ws.send(JSON.stringify({
@@ -165,8 +171,7 @@ function handleRequestMessage(message) {
 	ACKButton.style.display="";
 	NAKButton.style.display="";
 
-	ACKButton.addEventListener('click', function(event){ handleACKBtn(message) });
-	NAKButton.addEventListener('click', function(event){ handleNAKBtn(message) });
+	callDestination = message.data.source;
 /*
 	var confirmflag = confirm('call from : ' + message.data.source);
 	if(confirmflag){ //if ACK
@@ -557,7 +562,7 @@ function setGuestArray(message){
 }
 
 function setGuestImage(){
-
+	onGuestImg.style.display = "none";
 	for(var i = 0; i<9; i++){
 		guestArr[i].style.display = "";
 		if(guestArr[i].id == "blank"+i){
@@ -565,21 +570,23 @@ function setGuestImage(){
 		}
 		else{
 			//guestArr[i].src = 'http://www.kidsmathgamesonline.com/images/pictures/numbers600/number'+String(i+1)+'.jpg';
-			guestArr[i].src = 'http://localhost/userImages/'+guestArr[i].id;
+			guestArr[i].src = 'http://localhost/userImages/'+guestArr[i].id+'?t=' + new Date().getTime();
 		}
 		guestArr[i].width = remoteVideo.width/3;
 		guestArr[i].height = remoteVideo.height/3;
-		guestArr[i].style.left = (String)(local_box.offsetLeft + 400 + guestArr[i].width*(i%3)) + 'px';
+		/*
+		guestArr[i].style.left = (String)(guest_box.offsetLeft + 400 + guestArr[i].width*(i%3)) + 'px';
 
 		if(i>=0 && i<3){
-			guestArr[i].style.top = (String)(local_box.offsetTop) + 'px';
+			guestArr[i].style.top = (String)(guest_box.offsetTop) + 'px';
 		}
 		else if(i>=3 && i<6){
-			guestArr[i].style.top = (String)(local_box.offsetTop + guestArr[i].height) + 'px';
+			guestArr[i].style.top = (String)(guest_box.offsetTop + guestArr[i].height) + 'px';
 		}
 		else{
-			guestArr[i].style.top = (String)(local_box.offsetTop + 2*guestArr[i].height) + 'px';
+			guestArr[i].style.top = (String)(guest_box.offsetTop + 2*guestArr[i].height) + 'px';
 		}
+		*/
 	}
 
 }
@@ -589,17 +596,25 @@ function setLoadingImage(targetId){
 	var targetNum = 0;
 	for(var i in guestArr){
 		if(guestArr[i].id != targetId){
-			guestArr[i].style.display = "none";
+//			guestArr[i].style.display = "none";
 		}
 		else {
 			targetNum = i;
 		}
 	}
-	guestArr[targetNum].style.top = (String)(local_box.offsetTop) + 'px';
-	guestArr[targetNum].style.left = (String)(local_box.offsetLeft + 400 )+ 'px';
+	onGuestImg.src = guestArr[targetNum].src;
+	offGuestImage();
+	/*
+	guestArr[targetNum].style.top = (String)(guest_box.offsetTop) + 'px';
+	guestArr[targetNum].style.left = (String)(guest_box.offsetLeft + 400 )+ 'px';
+	*/
+	/*
 	guestArr[targetNum].width = remoteVideo.width;
 	guestArr[targetNum].height = remoteVideo.height;
-
+	*/
+	onGuestImg.width = remoteVideo.width;
+	onGuestImg.height = remoteVideo.height;
+	onGuestImg.style.display = "";
 }
 
 function offGuestImage(){
@@ -613,48 +628,51 @@ function offGuestImage(){
 function setRemoteVideo(){
 
 	offGuestImage();
+	onGuestImg.style.display = "none";
 	remoteVideo.style.display = "";
+	/*
   remoteVideo.style.position = "absolute";
-	remoteVideo.style.top = (String)(local_box.offsetTop) + 'px';
-	remoteVideo.style.left = (String)(local_box.offsetLeft + 400 ) + 'px';
-
-	console.log(remoteVideo.style);
+	remoteVideo.style.top = (String)(guest_box.offsetTop) + 'px';
+	remoteVideo.style.left = (String)(guest_box.offsetLeft + 400 ) + 'px';
+*/
 }
 
-function handleACKBtn(message){
-
+function handleACKBtn(){
+console.log("send ACK");
 		ws.send(JSON.stringify({
 			"type": "response",
 			"data": {
 				"accept": true,
 				"source": callSource,
-				"destination": message.data.source
+				"destination": callDestination
 			}
 		}));
 
 		ACKButton.style.display="none";
 		NAKButton.style.display="none";
-
-		ACKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
-		NAKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+/*
+		ACKButton.removeEventListener('click', handleACKBtn(message), true);
+		NAKButton.removeEventListener('click', handleNAKBtn(message), true);
+*/
 }
 
-function handleNAKBtn(message){
-console.log(message);
+function handleNAKBtn(){
+console.log("send NAK");
 	ws.send(JSON.stringify({
 		"type": "response",
 		"data": {
 			"accept": false,
 			"source": callSource,
-			"destination": message.data.source
+			"destination": callDestination
 		}
 	}));
 
 	ACKButton.style.display="none";
 	NAKButton.style.display="none";
-
-	ACKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
-	NAKButton.removeEventListener('click', function(message){ handleACKBtn(message) });
+/*
+	ACKButton.removeEventListener('click', handleACKBtn(message), true);
+	NAKButton.removeEventListener('click', handleNAKBtn(message), true);
+*/
 }
 
 function handleCompleteMessage(message){
@@ -662,7 +680,9 @@ function handleCompleteMessage(message){
 	sendScreenshot(false);
 	ws.send(JSON.stringify({
 		"type": "complete_callee",
-		"data": {}
+		"data": {
+			"source": callSource
+		}
 	}));
 
 }

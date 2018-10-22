@@ -1,1 +1,208 @@
-video { filter: hue-rotate(180deg) saturate(200%); -moz-filter: hue-rotate(180deg) saturate(200%); -webkit-filter: hue-rotate(180deg) saturate(200%); }
+@charset "utf-8";
+
+@font-face {
+    font-family: 'notokr-thin';
+    src: url('webfont/notokr-thin.eot');
+    src: url('webfont/notokr-thin.eot?#iefix') format('embedded-opentype'),
+         url('webfont/notokr-thin.woff2') format('woff2'),
+         url('webfont/notokr-thin.woff') format('woff'),
+         url('webfont/notokr-thin.ttf') format('truetype'),
+         url('webfont/notokr-thin.svg#notokr-thin') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'notokr-light';
+    src: url('webfont/notokr-light.eot');
+    src: url('webfont/notokr-light.eot?#iefix') format('embedded-opentype'),
+         url('webfont/notokr-light.woff2') format('woff2'),
+         url('webfont/notokr-light.woff') format('woff'),
+         url('webfont/notokr-light.ttf') format('truetype'),
+         url('webfont/notokr-light.svg#notokr-light') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'notokr-demilight';
+    src: url('webfont/notokr-demilight.eot');
+    src: url('webfont/notokr-demilight.eot?#iefix') format('embedded-opentype'),
+         url('webfont/notokr-demilight.woff2') format('woff2'),
+         url('webfont/notokr-demilight.woff') format('woff'),
+         url('webfont/notokr-demilight.ttf') format('truetype'),
+         url('webfont/notokr-demilight.svg#notokr-demilight') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'notokr-regular';
+    src: url('webfont/notokr-regular.eot');
+    src: url('webfont/notokr-regular.eot?#iefix') format('embedded-opentype'),
+         url('webfont/notokr-regular.woff2') format('woff2'),
+         url('webfont/notokr-regular.woff') format('woff'),
+         url('webfont/notokr-regular.ttf') format('truetype'),
+         url('webfont/notokr-regular.svg#notokr-regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'notokr-medium';
+    src: url('webfont/notokr-medium.eot');
+    src: url('webfont/notokr-medium.eot?#iefix') format('embedded-opentype'),
+         url('webfont/notokr-medium.woff2') format('woff2'),
+         url('webfont/notokr-medium.woff') format('woff'),
+         url('webfont/notokr-medium.ttf') format('truetype'),
+         url('webfont/notokr-medium.svg#notokr-medium') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'notokr-bold';
+    src: url('webfont/notokr-bold.eot');
+    src: url('webfont/notokr-bold.eot?#iefix') format('embedded-opentype'),
+         url('webfont/notokr-bold.woff2') format('woff2'),
+         url('webfont/notokr-bold.woff') format('woff'),
+         url('webfont/notokr-bold.ttf') format('truetype'),
+         url('webfont/notokr-bold.svg#notokr-bold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff url("images/background.jpeg") no-repeat center center;
+  background-size: auto;
+  font-family: 'notokr-regular';
+}
+
+#wrap {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+#contents {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 700px;
+  height: 400px;
+  margin: auto;
+}
+
+#header {
+  display: block;
+}
+
+#header > .title {
+  width: 100%;
+  height: 100px;
+  font-family: 'notokr-thin';
+  font-size: 40px;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0px 0px 8px #000000;
+}
+
+#header > .title span {
+  font-family: 'notokr-bold';
+}
+
+#videos {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+#videos > .local_video_box {
+  display: inline;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  margin: 0;
+  padding: 0;
+  width: 320px;
+  line-height: 0px;
+}
+
+#videos > .remote_video_box {
+  display: inline;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  margin: 0;
+  padding: 0;
+  width: 320px;
+  line-height: 0px;
+}
+
+#videos > .local_video_box .one_local_video,
+#videos > .remote_video_box .guests_images,
+#videos > .remote_video_box .one_guest_video,
+#videos > .remote_video_box .guest_image {
+  width: 320px;
+}
+
+#videos > .local_video_box .buttons,
+#videos > .remote_video_box .buttons {
+  display: block;
+  width: 320px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+button {
+  box-sizing: border-box;
+  height: 32px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-family: 'notokr-light';
+  font-size: 15px;
+  line-height: 22px;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+}
+
+@media screen and (max-width:750px) {
+
+  #contents {
+    width: 100%;
+    height: 670px;
+  }
+
+  #header > .title {
+    font-size: 30px;
+    height: 70px;
+  }
+
+  #videos > .local_video_box {
+    display: block;
+    position: relative;
+    margin: 0 auto;
+  }
+
+  #videos > .remote_video_box {
+    display: block;
+    position: relative;
+    margin: 20px auto 0 auto;
+  }
+
+}
+
+/*
+video {
+  filter: hue-rotate(180deg) saturate(200%);
+  -moz-filter: hue-rotate(180deg) saturate(200%);
+  -webkit-filter: hue-rotate(180deg) saturate(200%);
+}
+*/
