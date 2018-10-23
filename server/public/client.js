@@ -4,8 +4,9 @@ var remoteVideo = document.getElementById("remote_video");
 var refreshButton = document.getElementById("refresh_guest_member");
 var guest_box = document.getElementById("guest_image_array");
 var local_box = document.getElementById("local_container");
-var ACKButton = document.getElementById("ACK_btn");
-var NAKButton = document.getElementById("NAK_btn");
+//var ACKButton = document.getElementById("ACK_btn");
+//var NAKButton = document.getElementById("NAK_btn");
+var remoteButtons = document.getElementById("remote_container_buttons");
 var on_guest_box = document.getElementById("on_guest_img_container");
 var hangupButton = document.getElementById("hangup_button");
 
@@ -21,9 +22,14 @@ for(var i=0; i<9; i++){
 //	guestArr[i].style.position = "absolute";
 	guest_box.appendChild(guestArr[i]);
 	guestArr[i].addEventListener('click', function(event){ handleRequestClick(event.target.id) });
-	guestArr[i].onerror = function(e){
+	guestArr[i].onerror = function(e){	//error handle except IE
 		e.target.src = '/static/images/failed.png';
 	};
+	/* error hande in IE
+	guestArr[i].attachEvent("onerror", function(e){
+		e.srcElement.src = '/static/images/failed.png';
+	};
+	*/
 }
 
 var ScreenshotTimer = null;
@@ -174,8 +180,9 @@ function handleRequestMessage(message) {
 	console.log("get response message", message);
 
 	setLoadingImage(message.data.source);
-	ACKButton.style.display="";
-	NAKButton.style.display="";
+//	ACKButton.style.display="";
+//	NAKButton.style.display="";
+	remoteButtons.style.display = "";
 	refreshButton.style.display = "none";
 
 	callDestination = message.data.source;
@@ -673,8 +680,9 @@ console.log("send ACK");
 			}
 		}));
 
-		ACKButton.style.display="none";
-		NAKButton.style.display="none";
+//		ACKButton.style.display="none";
+//		NAKButton.style.display="none";
+		remoteButtons.style.display="none";
 		refreshLoadingImage(false, callDestination);
 /*
 		ACKButton.removeEventListener('click', handleACKBtn(message), true);
@@ -693,8 +701,9 @@ console.log("send NAK");
 		}
 	}));
 
-	ACKButton.style.display="none";
-	NAKButton.style.display="none";
+//	ACKButton.style.display="none";
+//	NAKButton.style.display="none";
+	remoteButtons.style.display="none";
 	refreshButton.style.display = "";
 	refreshLoadingImage(false, callDestination);
 /*
