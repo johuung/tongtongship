@@ -127,6 +127,7 @@ video {
   width: 100%;
   text-align: center;
   top: 20px;
+  z-index: 3;
 }
 
 #container > .local_video_box .one_local_video #remote_video {
@@ -185,6 +186,7 @@ video {
 #container > .remote_video_box .buttons {
   margin-top: 15px;
   text-align: center;
+  z-index: 3;
 }
 
 @media screen and (max-width:900px) {
