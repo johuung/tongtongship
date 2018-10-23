@@ -4,6 +4,7 @@ var remoteVideo = document.getElementById("remote_video");
 var refreshButton = document.getElementById("refresh_guest_member");
 var guest_box = document.getElementById("guest_image_array");
 var local_box = document.getElementById("local_container");
+var remote_box = document.getElementById("remote_container");
 //var ACKButton = document.getElementById("ACK_btn");
 //var NAKButton = document.getElementById("NAK_btn");
 var remoteButtons = document.getElementById("remote_container_buttons");
@@ -501,6 +502,9 @@ function handleICEConnectionStateChangeEvent(event) {
 	switch(peerConnection.iceConnectionState) {
 		case "completed":
 		sendScreenshot(false);
+		remote_box.style.display = "none";
+		localVideo.height = localVideo.height/4;
+		localVideo.width = localVideo.width/4;
 		hangupButton.style.display = "";
 		ws.send(JSON.stringify({
 			"type": "complete_caller",
@@ -714,6 +718,9 @@ console.log("send NAK");
 
 function handleCompleteMessage(message){
 	hangupButton.style.display = "";
+	remote_box.style.display = "none";
+	localVideo.height = localVideo.height/4;
+	localVideo.width = localVideo.width/4;
 	sendScreenshot(false);
 	ws.send(JSON.stringify({
 		"type": "complete_callee",
