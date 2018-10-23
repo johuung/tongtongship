@@ -13,7 +13,8 @@
     <section id="container">
       <div class="local_video_box" id="local_container">
         <div class="one_local_video">
-          <video id="local_video" autoplay playsinline muted></video>
+          <video id="remote_video" autoplay playsinline style="display:none;"></video>
+          <video id="local_video" autoplay playsinline muted width="100%" height="100%"></video>
           <div class="buttons">
             <button id="refresh_guest_member" onclick="handleRefreshClick();">Refresh Guests Member</button>
             <button id="hangup_button" onclick="handleHangUpClick();" style="display:none;">Hang Up</button>
@@ -24,13 +25,10 @@
       <div class="remote_video_box" id="remote_container">
         <div class="guests_images" id="guest_image_array"></div>
         <div class="guest_image" id="on_guest_img_container"></div>
-        <div class="one_guest_video">
-          <video id="remote_video" autoplay playsinline style="display:none;"></video>
+        <div class="buttons" style="display:none;" id="remote_container_buttons">
+          <button id="ACK_btn" onclick="handleACKBtn()">ACK</button>
+          <button id="NAK_btn" onclick="handleNAKBtn()">NAK</button>
         </div>
-        <div class="buttons">
-          <button id="ACK_btn" style="display:none;" onclick="handleACKBtn()">ACK</button>
-          <button id="NAK_btn" style="display:none;" onclick="handleNAKBtn()">NAK</button>
-        <div>
       </div>
     </section>
   </body>

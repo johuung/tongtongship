@@ -61,8 +61,8 @@ navigator.mediaDevices.getUserMedia(constraints)
 .then(function(localStream) {
 	localVideo.srcObject = localStream;
 	console.log('localStream is ', localStream);
-	localVideo.width = constraints.video.width;
-	localVideo.height = constraints.video.height;
+	//localVideo.width = constraints.video.width;
+	//localVideo.height = constraints.video.height;
 	remoteVideo.width = localVideo.width;
 	remoteVideo.height = localVideo.height;
 	sendScreenshot(true);
@@ -503,8 +503,8 @@ function handleICEConnectionStateChangeEvent(event) {
 		case "completed":
 		sendScreenshot(false);
 		remote_box.style.display = "none";
-		localVideo.height = localVideo.height/4;
-		localVideo.width = localVideo.width/4;
+		localVideo.width = "160";
+		localVideo.height = "120";
 		hangupButton.style.display = "";
 		ws.send(JSON.stringify({
 			"type": "complete_caller",
@@ -719,8 +719,8 @@ console.log("send NAK");
 function handleCompleteMessage(message){
 	hangupButton.style.display = "";
 	remote_box.style.display = "none";
-	localVideo.height = localVideo.height/4;
-	localVideo.width = localVideo.width/4;
+	localVideo.width = "160";
+	localVideo.height = "120";
 	sendScreenshot(false);
 	ws.send(JSON.stringify({
 		"type": "complete_callee",
