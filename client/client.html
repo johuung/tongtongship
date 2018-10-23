@@ -5,53 +5,36 @@
     <meta charset="UTF-8">
     <title>Tong Tong Chat</title>
     <meta name="viewport" content="width=device-width, user-scalable=no">
-    <link href="static/client.css" rel="stylesheet" type="text/css" />
+    <link href="static/client2.css" rel="stylesheet" type="text/css" />
+
   </head>
 
   <body>
-    <div id="wrap">
-      <div id="contents">
-        <section id="header">
-          <div class="title">Hi! <span>Tong Tong</span> Chat</div>
-        </section>
-
-        <section id="videos">
-          <div class="local_video_box" id="local_container">
-            <div class="one_local_video">
-              <video id="local_video" autoplay playsinline muted></video>
-            </div>
-            <div class="buttons">
-              <button id="refresh_guest_member" onclick="handleRefreshClick();">
-                Refresh Guests Member
-              </button>
-              <button id="hangup_button" onclick="handleHangUpClick();" style="display:none;">
-                Hang Up
-              </button>
-            </div>
+    <section id="container">
+      <div class="local_video_box" id="local_container">
+        <div class="one_local_video">
+          <video id="local_video" autoplay playsinline muted></video>
+          <div class="buttons">
+            <button id="refresh_guest_member" onclick="handleRefreshClick();">Refresh Guests Member</button>
+            <button id="hangup_button" onclick="handleHangUpClick();" style="display:none;">Hang Up</button>
           </div>
-
-          <div class="remote_video_box" id="remote_container">
-            <div class="guests_images" id="guest_image_array"></div>
-            <div class="one_guest_video">
-              <video id="remote_video" autoplay playsinline style="display:none;"></video>
-            </div>
-            <div class="guest_image" id="on_guest_img_container"></div>
-            <div class="buttons">
-              <button id="ACK_btn" style="display:none;" onclick="handleACKBtn()">
-                ACK
-              </button>
-              <button id="NAK_btn" style="display:none;" onclick="handleNAKBtn()">
-                NAK
-              </button>
-            <div>
-          </div>
-          <!-- <canvas id="screenshot" style="display:none;" width=640 height=480></canvas> -->
-        </section>
-
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-        <script src="static/notify.min.js"></script>
-        <script src="static/client.js"></script>
+        </div>
       </div>
-    </div>
+
+      <div class="remote_video_box" id="remote_container">
+        <div class="guests_images" id="guest_image_array"></div>
+        <div class="guest_image" id="on_guest_img_container"></div>
+        <div class="one_guest_video">
+          <video id="remote_video" autoplay playsinline style="display:none;"></video>
+        </div>
+        <div class="buttons">
+          <button id="ACK_btn" style="display:none;" onclick="handleACKBtn()">ACK</button>
+          <button id="NAK_btn" style="display:none;" onclick="handleNAKBtn()">NAK</button>
+        <div>
+      </div>
+    </section>
   </body>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="static/notify.min.js"></script>
+  <script src="static/client.js"></script>
 </html>
