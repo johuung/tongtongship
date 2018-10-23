@@ -184,7 +184,6 @@ function handleRequestMessage(message) {
 //	ACKButton.style.display="";
 //	NAKButton.style.display="";
 	remoteButtons.style.display = "";
-	refreshButton.style.display = "none";
 
 	callDestination = message.data.source;
 /*
@@ -267,7 +266,7 @@ function handleResponseMessage(message) {
 	else { // NAK
 //		sendScreenshot(true);
 		$.notify("Call Was Rejected T.T", "error");
-
+		refreshButton.style.display = "";
 	}
 
 
@@ -387,7 +386,6 @@ function handleRemoveStreamEvent(event) {
 }
 
 function handleHangUpClick() {
-	closeVideoCall();
 	ws.send(JSON.stringify({
 		"type": "hangup",
 		"data": {
@@ -395,6 +393,7 @@ function handleHangUpClick() {
 			"destination": callDestination
 		}
 	}));
+	closeVideoCall();
 }
 
 function closeVideoCall() {
@@ -638,6 +637,7 @@ function setLoadingImage(targetId){
 	}
 	*/
 //	onGuestImg.src = guestArr[targetNum].src;
+	refreshButton.style.display = "none";
 	refreshLoadingImage(true, targetId);
 	offGuestImage();
 	/*
