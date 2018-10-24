@@ -255,7 +255,6 @@ function handleResponseMessage(message) {
 			peerConnection.oniceconnectionstatechange = handleICEConnectionStateChangeEvent;
 		  peerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
 		  peerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
-			j
 
 	}
 	else { // NAK
