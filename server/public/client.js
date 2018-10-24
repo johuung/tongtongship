@@ -140,7 +140,13 @@ function handleMessageEvent(event){
 }
 
 function handleRefreshClick(){
-
+	ws.send(JSON.stringify({
+		"type": "refresh",
+		"data": {
+			"source": callSource
+			}
+		}));
+		console.log("send refresh");
 }
 
 function handleRequestClick(targetId){
@@ -256,6 +262,7 @@ function handleResponseMessage(message) {
 		  peerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
 		  peerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
 
+		}
 	}
 	else { // NAK
 //		sendScreenshot(true);
