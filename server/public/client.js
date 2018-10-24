@@ -262,12 +262,6 @@ function handleResponseMessage(message) {
 		  peerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
 		  peerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
 
-		}
-		localVideo.srcObject.getTracks().forEach(track => {
-			console.log("add track");
-			peerConnection.addTrack(track, localVideo.srcObject);
-		});
-
 	}
 	else { // NAK
 //		sendScreenshot(true);

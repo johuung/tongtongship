@@ -139,8 +139,8 @@ video {
 
 #container > .local_video_box .one_local_video #local_video {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: 0px;
+  right: 0px;
   object-fit: contain;
   z-index: 2;
 }
