@@ -233,6 +233,8 @@ function handleMessageEvent(webSocket, data){
 		case "screenshot":
 		handleScreenshotMessage(webSocket, message);
 		break;
+		case "refresh":
+		handleRefreshMessage(message);
 		case "request":
 		handleRequestMessage(message);
 		break;
@@ -277,6 +279,23 @@ function handleScreenshotMessage(webSocket, message) {
 				webSocket.send(data);
 			});
 		}
+	});
+}
+
+function handleRefreshMessage(message) {
+	Matchings.destory({
+		where: {
+			host: message.data.source
+		}
+	}).then(() => {
+		getRandomLobbyUsers(message.data.source).then((randomUsers) => {
+			for (let randomUser of randomUsers) {
+				Matchings.create({
+					host: message.data.source,
+					guest: randomUser.get('cookie')
+				});
+			}
+		});
 	});
 }
 
