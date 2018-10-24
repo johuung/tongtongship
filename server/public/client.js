@@ -262,6 +262,7 @@ function handleResponseMessage(message) {
 		  peerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
 		  peerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
 
+		}
 	}
 	else { // NAK
 //		sendScreenshot(true);
